@@ -1,0 +1,30 @@
+[
+  {
+    "keywords": ["서울", "서울시", "서울특별시"],
+    "type": "coord",
+    "lat": 37.5665,
+    "lon": 126.9780,
+    "displayName": "서울특별시"
+  },
+  {
+    "keywords": ["인천", "인천시", "인천광역시"],
+    "type": "coord",
+    "lat": 37.4563,
+    "lon": 126.7052,
+    "displayName": "인천광역시"
+  },
+  {
+    "keywords": ["부천", "부천시"],
+    "type": "coord",
+    "lat": 37.5036,
+    "lon": 126.7660,
+    "displayName": "경기도 부천시"
+  },
+  {
+    "keywords": ["신림", "신림동"],
+    "type": "coord",
+    "lat": 37.4843,
+    "lon": 126.9297,
+    "displayName": "서울특별시 관악구 신림동"
+  }
+]
