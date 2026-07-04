@@ -58,7 +58,8 @@ export default function App() {
   const [searchError, setSearchError] = useState('');
   const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([]);
   const [favoriteLocations, setFavoriteLocations] = useState<FavoriteLocation[]>([]);
-  const [currentSearchLocation, setCurrentSearchLocation] = useState<FavoriteLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<FavoriteLocation | null>(null);
+  const [isManualLocation, setIsManualLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -106,7 +107,7 @@ export default function App() {
   const loadCurrentLocationWeather = async (): Promise<boolean> => {
     setIsLoading(true);
     setErrorMessage(null);
-    setCurrentSearchLocation(null);
+    setIsManualLocation(false);
 
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -134,7 +135,21 @@ export default function App() {
       });
 
       const addressText = address ? formatAddress(address) : '주소를 불러올 수 없습니다';
-      return loadWeatherByLocation(coords.latitude, coords.longitude, addressText);
+      const success = await loadWeatherByLocation(
+        coords.latitude,
+        coords.longitude,
+        addressText,
+      );
+
+      if (success) {
+        setSelectedLocation({
+          name: addressText,
+          lat: coords.latitude,
+          lon: coords.longitude,
+        });
+      }
+
+      return success;
     } finally {
       setIsLoading(false);
     }
@@ -165,6 +180,28 @@ export default function App() {
     }
   };
 
+  const handleRefresh = async () => {
+    if (!selectedLocation) return;
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      await loadWeatherByLocation(
+        selectedLocation.lat,
+        selectedLocation.lon,
+        selectedLocation.name,
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const applySelectedLocation = (location: FavoriteLocation) => {
+    setSelectedLocation(location);
+    setIsManualLocation(true);
+  };
+
   const applyLocationSearch = async (location: FavoriteLocation) => {
     setSearchCity(location.name);
     setIsLoading(true);
@@ -175,12 +212,13 @@ export default function App() {
     try {
       const success = await loadWeatherByLocation(location.lat, location.lon, location.name);
       if (success) {
-        setCurrentSearchLocation(location);
+        applySelectedLocation(location);
         const updatedRecent = await addRecentSearch(location);
         setRecentSearches(updatedRecent);
       } else {
         setSearchError('날씨 정보를 가져오지 못했습니다.');
-        setCurrentSearchLocation(null);
+        setSelectedLocation(null);
+        setIsManualLocation(false);
       }
     } finally {
       setIsLoading(false);
@@ -192,7 +230,6 @@ export default function App() {
     const trimmed = city.trim();
     if (!trimmed) {
       setSearchError('도시명을 입력해주세요.');
-      setCurrentSearchLocation(null);
       return;
     }
 
@@ -205,7 +242,6 @@ export default function App() {
     try {
       const result = await getCityWeather(trimmed);
       if (result.lat == null || result.lon == null) {
-        setCurrentSearchLocation(null);
         setSearchError('도시를 찾을 수 없습니다.');
         return;
       }
@@ -218,18 +254,16 @@ export default function App() {
 
       const success = await loadWeatherByLocation(location.lat, location.lon, location.name);
       if (success) {
-        setCurrentSearchLocation(location);
+        applySelectedLocation(location);
         const updatedRecent = await addRecentSearch(location);
         setRecentSearches(updatedRecent);
       } else {
         setSearchError('날씨 정보를 가져오지 못했습니다.');
-        setCurrentSearchLocation(null);
       }
     } catch (error) {
       console.error(error);
       setErrorMessage(WEATHER_ERROR);
       setSearchError('도시를 찾을 수 없습니다.');
-      setCurrentSearchLocation(null);
     } finally {
       setIsLoading(false);
       setSearchLoading(false);
@@ -256,8 +290,8 @@ export default function App() {
     setFavoriteLocations(updated);
   };
 
-  const isFavorite = currentSearchLocation
-    ? favoriteLocations.some((item) => item.name === currentSearchLocation.name)
+  const isFavorite = selectedLocation && isManualLocation
+    ? favoriteLocations.some((item) => item.name === selectedLocation.name)
     : false;
 
   const showInitialLoading = isLoading && !weather;
@@ -288,8 +322,11 @@ export default function App() {
             weather={weather}
             weatherMessage={weatherMessage}
             onReturnToCurrentLocation={handleReturnToCurrentLocation}
+            onRefresh={handleRefresh}
             isLocationLoading={isLoading}
-            currentSearchLocation={currentSearchLocation}
+            canRefresh={selectedLocation != null}
+            selectedLocation={selectedLocation}
+            isManualLocation={isManualLocation}
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
           />

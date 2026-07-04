@@ -7,8 +7,11 @@ type Props = {
   weather: CurrentWeather | null;
   weatherMessage: string;
   onReturnToCurrentLocation: () => void;
+  onRefresh: () => void;
   isLocationLoading?: boolean;
-  currentSearchLocation?: FavoriteLocation | null;
+  canRefresh?: boolean;
+  selectedLocation?: FavoriteLocation | null;
+  isManualLocation?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (location: FavoriteLocation) => void;
 };
@@ -18,34 +21,48 @@ export default function CurrentWeatherCard({
   weather,
   weatherMessage,
   onReturnToCurrentLocation,
+  onRefresh,
   isLocationLoading = false,
-  currentSearchLocation = null,
+  canRefresh = false,
+  selectedLocation = null,
+  isManualLocation = false,
   isFavorite = false,
   onToggleFavorite,
 }: Props) {
-  const isSelectedLocation = currentSearchLocation != null;
-
   return (
     <>
       <View style={styles.card}>
         <View style={styles.locationHeader}>
           <Text style={styles.label}>
-            {isSelectedLocation ? '📍 선택한 위치' : '📍 현재 위치'}
+            {isManualLocation ? '📍 선택한 위치' : '📍 현재 위치'}
           </Text>
-          {isSelectedLocation && onToggleFavorite && (
-            <Pressable onPress={() => onToggleFavorite(currentSearchLocation)}>
+          {isManualLocation && selectedLocation && onToggleFavorite && (
+            <Pressable onPress={() => onToggleFavorite(selectedLocation)}>
               <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
             </Pressable>
           )}
         </View>
         <Text style={styles.location}>{locationText}</Text>
-        <Pressable
-          style={[styles.locationButton, isLocationLoading && styles.locationButtonDisabled]}
-          onPress={onReturnToCurrentLocation}
-          disabled={isLocationLoading}
-        >
-          <Text style={styles.locationButtonText}>현재 위치</Text>
-        </Pressable>
+        <View style={styles.buttonRow}>
+          <Pressable
+            style={[styles.actionButton, isLocationLoading && styles.actionButtonDisabled]}
+            onPress={onReturnToCurrentLocation}
+            disabled={isLocationLoading}
+          >
+            <Text style={styles.actionButtonText}>현재 위치</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.actionButton,
+              styles.refreshButton,
+              (isLocationLoading || !canRefresh) && styles.actionButtonDisabled,
+            ]}
+            onPress={onRefresh}
+            disabled={isLocationLoading || !canRefresh}
+          >
+            <Text style={styles.actionButtonText}>새로고침</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.card}>
@@ -99,16 +116,23 @@ const styles = StyleSheet.create({
     color: '#1c1c1e',
     marginBottom: 12,
   },
-  locationButton: {
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
     backgroundColor: '#007aff',
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  locationButtonDisabled: {
+  refreshButton: {
+    backgroundColor: '#34c759',
+  },
+  actionButtonDisabled: {
     opacity: 0.6,
   },
-  locationButtonText: {
+  actionButtonText: {
     color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
