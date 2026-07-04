@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
+import WeatherIcon from './WeatherIcon';
 
 type Props = {
   locationText: string;
@@ -74,7 +75,10 @@ export default function CurrentWeatherCard({
       <View style={styles.card}>
         {weather ? (
           <>
-            <Text style={styles.temperature}>☀️ {weather.temperature}°C</Text>
+            <View style={styles.weatherRow}>
+              <WeatherIcon icon={weather.icon} size={80} />
+              <Text style={styles.temperature}>{weather.temperature}°C</Text>
+            </View>
             <Text style={styles.condition}>{weather.condition}</Text>
             <Text style={styles.detail}>체감온도 {weather.feelsLike}°C</Text>
             <Text style={styles.detail}>습도 {weather.humidity}%</Text>
@@ -147,6 +151,10 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: '300',
     color: '#1c1c1e',
+  },
+  weatherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
   condition: {

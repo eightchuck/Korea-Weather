@@ -37,6 +37,7 @@ export type CurrentWeather = {
   temperature: number;
   feelsLike: number;
   condition: string;
+  icon: string;
   humidity: number;
   windSpeed: number;
 };
@@ -45,6 +46,7 @@ export type HourlyWeatherItem = {
   hour: string;
   temperature: number;
   condition: string;
+  icon: string;
 };
 
 export type WeeklyWeatherItem = {
@@ -52,12 +54,13 @@ export type WeeklyWeatherItem = {
   maxTemp: number;
   minTemp: number;
   condition: string;
+  icon: string;
 };
 
 type ForecastItem = {
   dt: number;
   main: { temp: number; temp_min: number; temp_max: number };
-  weather: { main: string; description: string }[];
+  weather: { main: string; description: string; icon: string }[];
 };
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
@@ -97,6 +100,7 @@ export async function getHourlyWeather(
       hour: `${date.getHours()}시`,
       temperature: Math.round(item.main.temp),
       condition: toKoreanWeather(item.weather[0].main, item.weather[0].description),
+      icon: item.weather[0].icon,
     };
   });
 }
@@ -127,6 +131,7 @@ export async function getWeeklyWeather(
         maxTemp,
         minTemp,
         condition: toKoreanWeather(mid.weather[0].main, mid.weather[0].description),
+        icon: mid.weather[0].icon,
       };
     });
 }
@@ -156,6 +161,7 @@ export async function getCurrentWeather(
     temperature: Math.round(data.main.temp),
     feelsLike: Math.round(data.main.feels_like),
     condition: toKoreanWeather(data.weather[0].main, data.weather[0].description),
+    icon: data.weather[0].icon,
     humidity: data.main.humidity,
     windSpeed: data.wind.speed,
   };
@@ -176,6 +182,7 @@ export type CityWeatherItem = {
   city: string;
   temp: number;
   weather: string;
+  icon: string;
   displayName?: string;
   lat?: number;
   lon?: number;
@@ -193,6 +200,7 @@ export async function getCityWeatherList(): Promise<CityWeatherItem[]> {
         city: item.city,
         temp: data.temperature,
         weather: data.condition,
+        icon: data.icon,
       };
     }),
   );
@@ -208,6 +216,7 @@ export async function getCityWeather(cityName: string): Promise<CityWeatherItem>
       city: location.displayName,
       temp: data.temperature,
       weather: data.condition,
+      icon: data.icon,
       displayName: location.displayName,
       lat: location.lat,
       lon: location.lon,
@@ -236,6 +245,7 @@ export async function getCityWeather(cityName: string): Promise<CityWeatherItem>
     city: displayName,
     temp: Math.round(data.main.temp),
     weather: toKoreanWeather(data.weather[0].main, data.weather[0].description),
+    icon: data.weather[0].icon,
     displayName,
     lat: data.coord.lat,
     lon: data.coord.lon,

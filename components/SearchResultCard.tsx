@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
+import WeatherIcon from './WeatherIcon';
 
 type Props = {
   location: FavoriteLocation;
@@ -24,9 +25,12 @@ export default function SearchResultCard({
         </Pressable>
       </View>
       <Text style={styles.location}>{location.name}</Text>
-      <Text style={styles.weather}>
-        {weather.temperature}°C · {weather.condition}
-      </Text>
+      <View style={styles.weatherRow}>
+        <WeatherIcon icon={weather.icon} size={48} />
+        <Text style={styles.weather}>
+          {weather.temperature}°C · {weather.condition}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -66,5 +70,10 @@ const styles = StyleSheet.create({
   weather: {
     fontSize: 16,
     color: '#3a3a3c',
+    flex: 1,
+  },
+  weatherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
