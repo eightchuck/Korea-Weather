@@ -54,7 +54,6 @@ export default function App() {
   const [weeklyWeather, setWeeklyWeather] = useState<WeeklyWeatherItem[]>([]);
   const [cityWeatherList, setCityWeatherList] = useState<CityWeatherItem[]>([]);
   const [searchCity, setSearchCity] = useState('');
-  const [searchedWeather, setSearchedWeather] = useState<CityWeatherItem | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([]);
@@ -68,103 +67,121 @@ export default function App() {
     getFavoriteLocations().then(setFavoriteLocations);
   }, []);
 
+  const loadWeatherByLocation = async (
+    lat: number,
+    lon: number,
+    locationName: string,
+  ): Promise<boolean> => {
+    setLocationText(locationName);
+
+    try {
+      const data = await getCurrentWeather(lat, lon);
+      setWeather(data);
+      setWeatherMessage('');
+    } catch (error) {
+      console.error(error);
+      setWeather(null);
+      setWeatherMessage('날씨 정보를 가져오지 못했습니다');
+      setErrorMessage(WEATHER_ERROR);
+      return false;
+    }
+
+    try {
+      const hourly = await getHourlyWeather(lat, lon);
+      setHourlyWeather(hourly);
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      const weekly = await getWeeklyWeather(lat, lon);
+      setWeeklyWeather(weekly);
+    } catch (error) {
+      console.error(error);
+    }
+
+    return true;
+  };
+
+  const loadCurrentLocationWeather = async (): Promise<boolean> => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    setCurrentSearchLocation(null);
+
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationText('위치 권한이 필요합니다');
+        setWeatherMessage('날씨 정보를 가져오지 못했습니다');
+        setErrorMessage(LOCATION_ERROR);
+        return false;
+      }
+
+      let coords: Location.LocationObjectCoords;
+      try {
+        coords = (await Location.getCurrentPositionAsync({})).coords;
+      } catch (error) {
+        console.error(error);
+        setLocationText('위치를 가져올 수 없습니다');
+        setWeatherMessage('날씨 정보를 가져오지 못했습니다');
+        setErrorMessage(LOCATION_ERROR);
+        return false;
+      }
+
+      const [address] = await Location.reverseGeocodeAsync({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
+
+      const addressText = address ? formatAddress(address) : '주소를 불러올 수 없습니다';
+      return loadWeatherByLocation(coords.latitude, coords.longitude, addressText);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
-      setErrorMessage(null);
+      await loadCurrentLocationWeather();
 
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setLocationText('위치 권한이 필요합니다');
-          setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-          setErrorMessage(LOCATION_ERROR);
-          return;
-        }
-
-        let coords: Location.LocationObjectCoords;
-        try {
-          coords = (await Location.getCurrentPositionAsync({})).coords;
-        } catch (error) {
-          console.error(error);
-          setLocationText('위치를 가져올 수 없습니다');
-          setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-          setErrorMessage(LOCATION_ERROR);
-          return;
-        }
-
-        const [address] = await Location.reverseGeocodeAsync({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        });
-
-        setLocationText(address ? formatAddress(address) : '주소를 불러올 수 없습니다');
-
-        try {
-          const data = await getCurrentWeather(coords.latitude, coords.longitude);
-          setWeather(data);
-          setWeatherMessage('');
-        } catch (error) {
-          console.error(error);
-          setWeather(null);
-          setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-          setErrorMessage(WEATHER_ERROR);
-        }
-
-        try {
-          const hourly = await getHourlyWeather(coords.latitude, coords.longitude);
-          setHourlyWeather(hourly);
-        } catch (error) {
-          console.error(error);
-        }
-
-        try {
-          const weekly = await getWeeklyWeather(coords.latitude, coords.longitude);
-          setWeeklyWeather(weekly);
-        } catch (error) {
-          console.error(error);
-        }
-
-        try {
-          const cities = await getCityWeatherList();
-          setCityWeatherList(cities);
-        } catch (error) {
-          console.error(error);
-        }
-      } finally {
-        setIsLoading(false);
+        const cities = await getCityWeatherList();
+        setCityWeatherList(cities);
+      } catch (error) {
+        console.error(error);
       }
     })();
   }, []);
 
-  const searchByCoords = async (location: FavoriteLocation) => {
+  const clearSearchState = () => {
+    setSearchCity('');
+    setSearchError('');
+  };
+
+  const handleReturnToCurrentLocation = async () => {
+    const success = await loadCurrentLocationWeather();
+    if (success) {
+      clearSearchState();
+    }
+  };
+
+  const applyLocationSearch = async (location: FavoriteLocation) => {
     setSearchCity(location.name);
     setIsLoading(true);
     setSearchLoading(true);
     setErrorMessage(null);
     setSearchError('');
-    setSearchedWeather(null);
 
     try {
-      const data = await getCurrentWeather(location.lat, location.lon);
-      const result: CityWeatherItem = {
-        city: location.name,
-        temp: data.temperature,
-        weather: data.condition,
-        displayName: location.name,
-        lat: location.lat,
-        lon: location.lon,
-      };
-      setSearchedWeather(result);
-      setCurrentSearchLocation(location);
-
-      const updatedRecent = await addRecentSearch(location);
-      setRecentSearches(updatedRecent);
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(WEATHER_ERROR);
-      setSearchError('날씨 정보를 가져오지 못했습니다.');
-      setCurrentSearchLocation(null);
+      const success = await loadWeatherByLocation(location.lat, location.lon, location.name);
+      if (success) {
+        setCurrentSearchLocation(location);
+        const updatedRecent = await addRecentSearch(location);
+        setRecentSearches(updatedRecent);
+      } else {
+        setSearchError('날씨 정보를 가져오지 못했습니다.');
+        setCurrentSearchLocation(null);
+      }
     } finally {
       setIsLoading(false);
       setSearchLoading(false);
@@ -175,7 +192,6 @@ export default function App() {
     const trimmed = city.trim();
     if (!trimmed) {
       setSearchError('도시명을 입력해주세요.');
-      setSearchedWeather(null);
       setCurrentSearchLocation(null);
       return;
     }
@@ -185,23 +201,28 @@ export default function App() {
     setSearchLoading(true);
     setErrorMessage(null);
     setSearchError('');
-    setSearchedWeather(null);
 
     try {
       const result = await getCityWeather(trimmed);
-      setSearchedWeather(result);
+      if (result.lat == null || result.lon == null) {
+        setCurrentSearchLocation(null);
+        setSearchError('도시를 찾을 수 없습니다.');
+        return;
+      }
 
-      if (result.lat != null && result.lon != null) {
-        const location: FavoriteLocation = {
-          name: result.displayName || result.city,
-          lat: result.lat,
-          lon: result.lon,
-        };
+      const location: FavoriteLocation = {
+        name: result.displayName || result.city,
+        lat: result.lat,
+        lon: result.lon,
+      };
+
+      const success = await loadWeatherByLocation(location.lat, location.lon, location.name);
+      if (success) {
         setCurrentSearchLocation(location);
-
         const updatedRecent = await addRecentSearch(location);
         setRecentSearches(updatedRecent);
       } else {
+        setSearchError('날씨 정보를 가져오지 못했습니다.');
         setCurrentSearchLocation(null);
       }
     } catch (error) {
@@ -220,11 +241,11 @@ export default function App() {
   };
 
   const handleRecentSearchPress = (item: RecentSearchItem) => {
-    searchByCoords(item);
+    applyLocationSearch(item);
   };
 
   const handleFavoritePress = (location: FavoriteLocation) => {
-    searchByCoords(location);
+    applyLocationSearch(location);
   };
 
   const handleToggleFavorite = async (location: FavoriteLocation) => {
@@ -239,7 +260,7 @@ export default function App() {
     ? favoriteLocations.some((item) => item.name === currentSearchLocation.name)
     : false;
 
-  const showInitialLoading = isLoading && !weather && !searchedWeather;
+  const showInitialLoading = isLoading && !weather;
 
   return (
     <ScrollView
@@ -254,7 +275,9 @@ export default function App() {
 
       {errorMessage && <ErrorMessage message={errorMessage} />}
 
-      {isLoading && !showInitialLoading && <LoadingMessage message="날씨 정보를 불러오는 중입니다..." />}
+      {isLoading && !showInitialLoading && (
+        <LoadingMessage message="날씨 정보를 불러오는 중입니다..." />
+      )}
 
       {showInitialLoading ? (
         <LoadingMessage />
@@ -264,6 +287,11 @@ export default function App() {
             locationText={locationText}
             weather={weather}
             weatherMessage={weatherMessage}
+            onReturnToCurrentLocation={handleReturnToCurrentLocation}
+            isLocationLoading={isLoading}
+            currentSearchLocation={currentSearchLocation}
+            isFavorite={isFavorite}
+            onToggleFavorite={handleToggleFavorite}
           />
 
           <SearchWeatherCard
@@ -273,14 +301,11 @@ export default function App() {
             onSearchCity={handleSearchCity}
             searchLoading={searchLoading}
             searchError={searchError}
-            searchedWeather={searchedWeather}
             recentSearches={recentSearches}
             onRecentSearchPress={handleRecentSearchPress}
             favoriteLocations={favoriteLocations}
             onToggleFavorite={handleToggleFavorite}
             onFavoritePress={handleFavoritePress}
-            currentSearchLocation={currentSearchLocation}
-            isFavorite={isFavorite}
           />
 
           <ForecastCard hourlyWeather={hourlyWeather} />

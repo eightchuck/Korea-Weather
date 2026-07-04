@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getLocationSuggestions, KoreanLocation } from '../data/koreanLocations';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { RecentSearchItem } from '../services/recentSearch';
-import { CityWeatherItem } from '../services/weather';
 
 type Props = {
   searchCity: string;
@@ -12,14 +11,11 @@ type Props = {
   onSearchCity: (city: string) => void;
   searchLoading: boolean;
   searchError: string;
-  searchedWeather: CityWeatherItem | null;
   recentSearches: RecentSearchItem[];
   onRecentSearchPress: (item: RecentSearchItem) => void;
   favoriteLocations: FavoriteLocation[];
   onToggleFavorite: (location: FavoriteLocation) => void;
   onFavoritePress: (location: FavoriteLocation) => void;
-  currentSearchLocation: FavoriteLocation | null;
-  isFavorite: boolean;
 };
 
 export default function SearchWeatherCard({
@@ -29,14 +25,11 @@ export default function SearchWeatherCard({
   onSearchCity,
   searchLoading,
   searchError,
-  searchedWeather,
   recentSearches,
   onRecentSearchPress,
   favoriteLocations,
   onToggleFavorite,
   onFavoritePress,
-  currentSearchLocation,
-  isFavorite,
 }: Props) {
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
 
@@ -49,10 +42,10 @@ export default function SearchWeatherCard({
     suggestionsVisible && searchCity.trim().length > 0 && suggestions.length > 0;
 
   useEffect(() => {
-    if (searchedWeather && !searchLoading) {
+    if (!searchLoading && !searchError && searchCity.trim()) {
       setSuggestionsVisible(false);
     }
-  }, [searchedWeather, searchLoading]);
+  }, [searchLoading, searchError, searchCity]);
 
   const handleChangeText = (text: string) => {
     onChangeSearchCity(text);
@@ -64,93 +57,70 @@ export default function SearchWeatherCard({
     onSearchCity(location.displayName);
   };
 
-  const searchedDisplayName =
-    searchedWeather?.displayName ||
-    searchedWeather?.city ||
-    searchCity;
-
   return (
-    <>
-      <View style={styles.card}>
-        <Text style={styles.label}>도시 검색</Text>
-        <View style={styles.searchRow}>
-          <TextInput
-            style={styles.searchInput}
-            value={searchCity}
-            onChangeText={handleChangeText}
-            placeholder="도시명 입력"
-            placeholderTextColor="#8e8e93"
-          />
-          <Pressable style={styles.searchButton} onPress={onSearch}>
-            <Text style={styles.searchButtonText}>검색</Text>
-          </Pressable>
-        </View>
-
-        {showSuggestions && (
-          <View style={styles.suggestionList}>
-            {suggestions.map((location) => (
-              <Pressable
-                key={location.displayName}
-                style={styles.suggestionItem}
-                onPress={() => handleSelectSuggestion(location)}
-              >
-                <Text style={styles.suggestionText}>{location.displayName}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-
-        {recentSearches.length > 0 && !showSuggestions && (
-          <View style={styles.recentList}>
-            <Text style={styles.sectionTitle}>최근 검색</Text>
-            {recentSearches.map((item) => (
-              <Pressable
-                key={`${item.name}-${item.lat}-${item.lon}`}
-                style={styles.listItem}
-                onPress={() => onRecentSearchPress(item)}
-              >
-                <Text style={styles.listText}>{item.name}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-
-        {favoriteLocations.length > 0 && !showSuggestions && (
-          <View style={styles.recentList}>
-            <Text style={styles.sectionTitle}>즐겨찾기</Text>
-            {favoriteLocations.map((item) => (
-              <View key={`${item.name}-${item.lat}-${item.lon}`} style={styles.favoriteRow}>
-                <Pressable style={styles.favoriteMain} onPress={() => onFavoritePress(item)}>
-                  <Text style={styles.listText}>{item.name}</Text>
-                </Pressable>
-                <Pressable onPress={() => onToggleFavorite(item)}>
-                  <Text style={styles.starActive}>★</Text>
-                </Pressable>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {searchLoading && <Text style={styles.detail}>검색 중...</Text>}
-        {searchError ? <Text style={styles.searchError}>{searchError}</Text> : null}
+    <View style={styles.card}>
+      <Text style={styles.label}>도시 검색</Text>
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          value={searchCity}
+          onChangeText={handleChangeText}
+          placeholder="도시명 입력"
+          placeholderTextColor="#8e8e93"
+        />
+        <Pressable style={styles.searchButton} onPress={onSearch}>
+          <Text style={styles.searchButtonText}>검색</Text>
+        </Pressable>
       </View>
 
-      {searchedWeather && (
-        <View style={styles.card}>
-          <View style={styles.resultHeader}>
-            <Text style={styles.label}>검색 결과</Text>
-            {currentSearchLocation && (
-              <Pressable onPress={() => onToggleFavorite(currentSearchLocation)}>
-                <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
-              </Pressable>
-            )}
-          </View>
-          <Text style={styles.row}>
-            {searchedDisplayName}  {Math.round(searchedWeather.temp)}°C  {searchedWeather.weather}
-          </Text>
+      {showSuggestions && (
+        <View style={styles.suggestionList}>
+          {suggestions.map((location) => (
+            <Pressable
+              key={location.displayName}
+              style={styles.suggestionItem}
+              onPress={() => handleSelectSuggestion(location)}
+            >
+              <Text style={styles.suggestionText}>{location.displayName}</Text>
+            </Pressable>
+          ))}
         </View>
       )}
-    </>
+
+      {recentSearches.length > 0 && !showSuggestions && (
+        <View style={styles.recentList}>
+          <Text style={styles.sectionTitle}>최근 검색</Text>
+          {recentSearches.map((item) => (
+            <Pressable
+              key={`${item.name}-${item.lat}-${item.lon}`}
+              style={styles.listItem}
+              onPress={() => onRecentSearchPress(item)}
+            >
+              <Text style={styles.listText}>{item.name}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+
+      {favoriteLocations.length > 0 && !showSuggestions && (
+        <View style={styles.recentList}>
+          <Text style={styles.sectionTitle}>즐겨찾기</Text>
+          {favoriteLocations.map((item) => (
+            <View key={`${item.name}-${item.lat}-${item.lon}`} style={styles.favoriteRow}>
+              <Pressable style={styles.favoriteMain} onPress={() => onFavoritePress(item)}>
+                <Text style={styles.listText}>{item.name}</Text>
+              </Pressable>
+              <Pressable onPress={() => onToggleFavorite(item)}>
+                <Text style={styles.starActive}>★</Text>
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {searchLoading && <Text style={styles.detail}>검색 중...</Text>}
+      {searchError ? <Text style={styles.searchError}>{searchError}</Text> : null}
+    </View>
   );
 }
 
@@ -172,27 +142,11 @@ const styles = StyleSheet.create({
     color: '#8e8e93',
     marginBottom: 6,
   },
-  resultHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 6,
-  },
-  starButton: {
-    fontSize: 24,
-    color: '#ff9500',
-  },
   detail: {
     fontSize: 15,
     color: '#8e8e93',
     marginBottom: 4,
     marginTop: 8,
-  },
-  row: {
-    fontSize: 16,
-    color: '#1c1c1e',
-    marginBottom: 8,
   },
   searchRow: {
     flexDirection: 'row',
