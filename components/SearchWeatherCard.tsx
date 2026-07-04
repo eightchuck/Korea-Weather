@@ -74,6 +74,9 @@ export default function SearchWeatherCard({
             onChangeText={handleChangeText}
             placeholder="도시명 입력"
             placeholderTextColor="#8e8e93"
+            returnKeyType="search"
+            onSubmitEditing={onSearch}
+            blurOnSubmit={false}
           />
           {searchCity.length > 0 && (
             <Pressable

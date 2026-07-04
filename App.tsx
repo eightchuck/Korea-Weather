@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native';
 import CityWeatherList from './components/CityWeatherList';
 import CurrentWeatherCard from './components/CurrentWeatherCard';
 import ErrorMessage from './components/ErrorMessage';
@@ -9,6 +9,7 @@ import ForecastCard from './components/ForecastCard';
 import LoadingMessage from './components/LoadingMessage';
 import SearchResultCard from './components/SearchResultCard';
 import SearchWeatherCard from './components/SearchWeatherCard';
+import Toast from './components/Toast';
 import WeeklyForecastCard from './components/WeeklyForecastCard';
 import {
   FavoriteLocation,
@@ -67,6 +68,27 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (message: string) => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+    setToastMessage(message);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+      toastTimerRef.current = null;
+    }, 2000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     getRecentSearches().then(setRecentSearches);
@@ -183,6 +205,7 @@ export default function App() {
     const success = await loadCurrentLocationWeather();
     if (success) {
       clearSearchState();
+      showToast('현재 위치 날씨로 돌아왔습니다.');
     }
   };
 
@@ -193,11 +216,14 @@ export default function App() {
     setErrorMessage(null);
 
     try {
-      await loadWeatherByLocation(
+      const success = await loadWeatherByLocation(
         selectedLocation.lat,
         selectedLocation.lon,
         selectedLocation.name,
       );
+      if (success) {
+        showToast('날씨 정보를 새로고침했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -263,6 +289,7 @@ export default function App() {
         applySelectedLocation(location);
         const updatedRecent = await addRecentSearch(location);
         setRecentSearches(updatedRecent);
+        Keyboard.dismiss();
       } else {
         setSearchError('날씨 정보를 가져오지 못했습니다.');
       }
@@ -287,11 +314,13 @@ export default function App() {
   const handleClearRecentSearches = async () => {
     const updated = await clearRecentSearches();
     setRecentSearches(updated);
+    showToast('최근 검색을 모두 삭제했습니다.');
   };
 
   const handleRemoveRecentSearch = async (item: RecentSearchItem) => {
     const updated = await removeRecentSearch(item.name);
     setRecentSearches(updated);
+    showToast('최근 검색을 삭제했습니다.');
   };
 
   const handleFavoritePress = (location: FavoriteLocation) => {
@@ -306,6 +335,9 @@ export default function App() {
       ? await removeFavoriteLocation(location.name)
       : await saveFavoriteLocation(location);
     setFavoriteLocations(updated);
+    showToast(
+      exists ? '즐겨찾기에서 제거되었습니다.' : '즐겨찾기에 추가되었습니다.',
+    );
   };
 
   const isFavorite = selectedLocation
@@ -315,12 +347,13 @@ export default function App() {
   const showInitialLoading = isLoading && !weather;
 
   return (
-    <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
+    <View style={styles.app}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
       <View style={styles.header}>
         <Text style={styles.appTitle}>Korea Weather</Text>
         <Text style={styles.subtitle}>오늘의 날씨를 확인하세요</Text>
@@ -385,14 +418,20 @@ export default function App() {
       )}
 
       <StatusBar style="auto" />
-    </ScrollView>
+      </ScrollView>
+
+      <Toast message={toastMessage} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  app: {
     flex: 1,
     backgroundColor: '#f2f2f7',
+  },
+  scrollView: {
+    flex: 1,
   },
   container: {
     paddingTop: 60,
