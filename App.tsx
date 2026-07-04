@@ -37,6 +37,7 @@ import {
   WeeklyWeatherItem,
 } from './services/weather';
 import { formatLastUpdated } from './utils/formatDateTime';
+import { theme } from './src/styles/theme';
 
 const WEATHER_ERROR = '날씨 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.';
 const LOCATION_ERROR = '현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.';
@@ -428,27 +429,27 @@ export default function App() {
 const styles = StyleSheet.create({
   app: {
     flex: 1,
-    backgroundColor: '#f2f2f7',
+    backgroundColor: theme.colors.background,
   },
   scrollView: {
     flex: 1,
   },
   container: {
     paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: theme.spacing.xl,
     paddingBottom: 48,
   },
   header: {
-    marginBottom: 32,
+    marginBottom: theme.spacing.xxl,
   },
   appTitle: {
-    fontSize: 28,
+    fontSize: theme.fontSize.title,
     fontWeight: 'bold',
-    color: '#1c1c1e',
-    marginBottom: 8,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#8e8e93',
+    fontSize: theme.fontSize.body,
+    color: theme.colors.subText,
   },
 });

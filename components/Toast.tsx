@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { theme } from '../src/styles/theme';
 
 type Props = {
   message: string | null;
@@ -20,19 +21,19 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 40,
-    left: 20,
-    right: 20,
+    left: theme.spacing.xl,
+    right: theme.spacing.xl,
     alignItems: 'center',
     zIndex: 999,
   },
   toast: {
-    backgroundColor: 'rgba(28, 28, 30, 0.92)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: 'rgba(31, 41, 55, 0.92)',
+    borderRadius: theme.radius.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
   },
   text: {
-    color: '#ffffff',
+    color: theme.colors.card,
     fontSize: 15,
     textAlign: 'center',
   },

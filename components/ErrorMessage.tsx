@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { theme } from '../src/styles/theme';
 
 type Props = {
   message: string;
@@ -14,16 +15,16 @@ export default function ErrorMessage({ message }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff5f5',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#FEF2F2',
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: '#ffcaca',
+    borderColor: '#FECACA',
   },
   text: {
     fontSize: 15,
-    color: '#ff3b30',
+    color: theme.colors.danger,
     textAlign: 'center',
   },
 });

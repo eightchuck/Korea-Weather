@@ -1,4 +1,5 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { theme } from '../src/styles/theme';
 
 type Props = {
   message?: string;
@@ -7,7 +8,7 @@ type Props = {
 export default function LoadingMessage({ message = '날씨 정보를 불러오는 중입니다...' }: Props) {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="small" color="#007aff" />
+      <ActivityIndicator size="small" color={theme.colors.primary} />
       <Text style={styles.text}>{message}</Text>
     </View>
   );
@@ -15,22 +16,18 @@ export default function LoadingMessage({ message = '날씨 정보를 불러오�
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    ...theme.shadow.card,
   },
   text: {
     fontSize: 15,
-    color: '#3a3a3c',
+    color: theme.colors.text,
     marginLeft: 10,
   },
 });

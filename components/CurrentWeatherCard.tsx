@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
+import { theme } from '../src/styles/theme';
 import WeatherIcon from './WeatherIcon';
 
 type Props = {
@@ -99,82 +100,78 @@ export default function CurrentWeatherCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    ...theme.shadow.card,
   },
   label: {
-    fontSize: 14,
-    color: '#8e8e93',
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.subText,
   },
   starButton: {
-    fontSize: 24,
-    color: '#ff9500',
+    fontSize: theme.fontSize.subtitle,
+    color: theme.colors.warning,
   },
   locationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 6,
+    marginBottom: theme.spacing.sm,
   },
   location: {
-    fontSize: 22,
+    fontSize: theme.fontSize.subtitle,
     fontWeight: '600',
-    color: '#1c1c1e',
-    marginBottom: 12,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.md,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: theme.spacing.sm,
   },
   actionButton: {
-    backgroundColor: '#007aff',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
   },
   refreshButton: {
-    backgroundColor: '#34c759',
+    backgroundColor: theme.colors.success,
   },
   actionButtonDisabled: {
     opacity: 0.6,
   },
   actionButtonText: {
-    color: '#ffffff',
+    color: theme.colors.card,
     fontSize: 15,
     fontWeight: '600',
   },
   temperature: {
-    fontSize: 48,
+    fontSize: theme.fontSize.temperature,
     fontWeight: '300',
-    color: '#1c1c1e',
+    color: theme.colors.text,
   },
   weatherRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   condition: {
-    fontSize: 20,
-    color: '#3a3a3c',
-    marginBottom: 12,
+    fontSize: theme.fontSize.subtitle,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.md,
   },
   detail: {
     fontSize: 15,
-    color: '#8e8e93',
-    marginBottom: 4,
+    color: theme.colors.subText,
+    marginBottom: theme.spacing.xs,
   },
   updatedAt: {
-    fontSize: 13,
-    color: '#8e8e93',
-    marginTop: 12,
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.subText,
+    marginTop: theme.spacing.md,
   },
 });
