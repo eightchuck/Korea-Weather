@@ -28,6 +28,14 @@ export async function addRecentSearch(location: RecentSearchItem): Promise<Recen
   return updated;
 }
 
-export async function clearRecentSearches(): Promise<void> {
+export async function removeRecentSearch(name: string): Promise<RecentSearchItem[]> {
+  const current = await getRecentSearches();
+  const updated = current.filter((item) => item.name !== name);
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  return updated;
+}
+
+export async function clearRecentSearches(): Promise<RecentSearchItem[]> {
   await AsyncStorage.removeItem(STORAGE_KEY);
+  return [];
 }

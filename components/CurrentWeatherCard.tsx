@@ -10,8 +10,8 @@ type Props = {
   onRefresh: () => void;
   isLocationLoading?: boolean;
   canRefresh?: boolean;
-  selectedLocation?: FavoriteLocation | null;
   isManualLocation?: boolean;
+  selectedLocation?: FavoriteLocation | null;
   isFavorite?: boolean;
   onToggleFavorite?: (location: FavoriteLocation) => void;
 };
@@ -24,11 +24,17 @@ export default function CurrentWeatherCard({
   onRefresh,
   isLocationLoading = false,
   canRefresh = false,
-  selectedLocation = null,
   isManualLocation = false,
+  selectedLocation = null,
   isFavorite = false,
   onToggleFavorite,
 }: Props) {
+  const canFavorite =
+    selectedLocation != null &&
+    selectedLocation.name.length > 0 &&
+    selectedLocation.lat != null &&
+    selectedLocation.lon != null;
+
   return (
     <>
       <View style={styles.card}>
@@ -36,7 +42,7 @@ export default function CurrentWeatherCard({
           <Text style={styles.label}>
             {isManualLocation ? '📍 선택한 위치' : '📍 현재 위치'}
           </Text>
-          {isManualLocation && selectedLocation && onToggleFavorite && (
+          {canFavorite && onToggleFavorite && (
             <Pressable onPress={() => onToggleFavorite(selectedLocation)}>
               <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
             </Pressable>
@@ -95,13 +101,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  locationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 6,
-  },
   label: {
     fontSize: 14,
     color: '#8e8e93',
@@ -109,6 +108,13 @@ const styles = StyleSheet.create({
   starButton: {
     fontSize: 24,
     color: '#ff9500',
+  },
+  locationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 6,
   },
   location: {
     fontSize: 22,

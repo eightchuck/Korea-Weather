@@ -7,6 +7,7 @@ import CurrentWeatherCard from './components/CurrentWeatherCard';
 import ErrorMessage from './components/ErrorMessage';
 import ForecastCard from './components/ForecastCard';
 import LoadingMessage from './components/LoadingMessage';
+import SearchResultCard from './components/SearchResultCard';
 import SearchWeatherCard from './components/SearchWeatherCard';
 import WeeklyForecastCard from './components/WeeklyForecastCard';
 import {
@@ -18,7 +19,9 @@ import {
 } from './services/favoriteLocations';
 import {
   addRecentSearch,
+  clearRecentSearches,
   getRecentSearches,
+  removeRecentSearch,
   RecentSearchItem,
 } from './services/recentSearch';
 import {
@@ -278,11 +281,23 @@ export default function App() {
     applyLocationSearch(item);
   };
 
+  const handleClearRecentSearches = async () => {
+    const updated = await clearRecentSearches();
+    setRecentSearches(updated);
+  };
+
+  const handleRemoveRecentSearch = async (item: RecentSearchItem) => {
+    const updated = await removeRecentSearch(item.name);
+    setRecentSearches(updated);
+  };
+
   const handleFavoritePress = (location: FavoriteLocation) => {
     applyLocationSearch(location);
   };
 
   const handleToggleFavorite = async (location: FavoriteLocation) => {
+    if (!location.name || location.lat == null || location.lon == null) return;
+
     const exists = await isFavoriteLocation(location.name);
     const updated = exists
       ? await removeFavoriteLocation(location.name)
@@ -290,7 +305,7 @@ export default function App() {
     setFavoriteLocations(updated);
   };
 
-  const isFavorite = selectedLocation && isManualLocation
+  const isFavorite = selectedLocation
     ? favoriteLocations.some((item) => item.name === selectedLocation.name)
     : false;
 
@@ -325,8 +340,8 @@ export default function App() {
             onRefresh={handleRefresh}
             isLocationLoading={isLoading}
             canRefresh={selectedLocation != null}
-            selectedLocation={selectedLocation}
             isManualLocation={isManualLocation}
+            selectedLocation={selectedLocation}
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
           />
@@ -340,10 +355,21 @@ export default function App() {
             searchError={searchError}
             recentSearches={recentSearches}
             onRecentSearchPress={handleRecentSearchPress}
+            onRemoveRecentSearch={handleRemoveRecentSearch}
+            onClearRecentSearches={handleClearRecentSearches}
             favoriteLocations={favoriteLocations}
             onToggleFavorite={handleToggleFavorite}
             onFavoritePress={handleFavoritePress}
           />
+
+          {isManualLocation && selectedLocation && weather && (
+            <SearchResultCard
+              location={selectedLocation}
+              weather={weather}
+              isFavorite={isFavorite}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          )}
 
           <ForecastCard hourlyWeather={hourlyWeather} />
 

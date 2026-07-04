@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getLocationSuggestions, KoreanLocation } from '../data/koreanLocations';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { RecentSearchItem } from '../services/recentSearch';
+import RecentSearchList from './RecentSearchList';
 
 type Props = {
   searchCity: string;
@@ -13,6 +14,8 @@ type Props = {
   searchError: string;
   recentSearches: RecentSearchItem[];
   onRecentSearchPress: (item: RecentSearchItem) => void;
+  onRemoveRecentSearch: (item: RecentSearchItem) => void;
+  onClearRecentSearches: () => void;
   favoriteLocations: FavoriteLocation[];
   onToggleFavorite: (location: FavoriteLocation) => void;
   onFavoritePress: (location: FavoriteLocation) => void;
@@ -27,33 +30,27 @@ export default function SearchWeatherCard({
   searchError,
   recentSearches,
   onRecentSearchPress,
+  onRemoveRecentSearch,
+  onClearRecentSearches,
   favoriteLocations,
   onToggleFavorite,
   onFavoritePress,
 }: Props) {
-  const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+  const trimmedSearch = searchCity.trim();
 
   const suggestions = useMemo(
     () => getLocationSuggestions(searchCity),
     [searchCity],
   );
 
-  const showSuggestions =
-    suggestionsVisible && searchCity.trim().length > 0 && suggestions.length > 0;
-
-  useEffect(() => {
-    if (!searchLoading && !searchError && searchCity.trim()) {
-      setSuggestionsVisible(false);
-    }
-  }, [searchLoading, searchError, searchCity]);
+  const showSuggestions = trimmedSearch.length > 0 && suggestions.length > 0;
+  const showRecentSearches = trimmedSearch.length === 0;
 
   const handleChangeText = (text: string) => {
     onChangeSearchCity(text);
-    setSuggestionsVisible(text.trim().length > 0);
   };
 
   const handleSelectSuggestion = (location: KoreanLocation) => {
-    setSuggestionsVisible(false);
     onSearchCity(location.displayName);
   };
 
@@ -87,23 +84,17 @@ export default function SearchWeatherCard({
         </View>
       )}
 
-      {recentSearches.length > 0 && !showSuggestions && (
-        <View style={styles.recentList}>
-          <Text style={styles.sectionTitle}>최근 검색</Text>
-          {recentSearches.map((item) => (
-            <Pressable
-              key={`${item.name}-${item.lat}-${item.lon}`}
-              style={styles.listItem}
-              onPress={() => onRecentSearchPress(item)}
-            >
-              <Text style={styles.listText}>{item.name}</Text>
-            </Pressable>
-          ))}
-        </View>
+      {showRecentSearches && (
+        <RecentSearchList
+          recentSearches={recentSearches}
+          onRecentSearchPress={onRecentSearchPress}
+          onRemoveRecentSearch={onRemoveRecentSearch}
+          onClearRecentSearches={onClearRecentSearches}
+        />
       )}
 
-      {favoriteLocations.length > 0 && !showSuggestions && (
-        <View style={styles.recentList}>
+      {favoriteLocations.length > 0 && (
+        <View style={styles.sectionList}>
           <Text style={styles.sectionTitle}>즐겨찾기</Text>
           {favoriteLocations.map((item) => (
             <View key={`${item.name}-${item.lat}-${item.lon}`} style={styles.favoriteRow}>
@@ -196,7 +187,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1c1c1e',
   },
-  recentList: {
+  sectionList: {
     width: '100%',
     marginTop: 12,
     borderTopWidth: 1,
@@ -208,12 +199,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 4,
     alignSelf: 'flex-start',
-  },
-  listItem: {
-    width: '100%',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f2f2f7',
   },
   listText: {
     fontSize: 16,
