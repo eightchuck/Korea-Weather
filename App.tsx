@@ -35,6 +35,7 @@ import {
   HourlyWeatherItem,
   WeeklyWeatherItem,
 } from './services/weather';
+import { formatLastUpdated } from './utils/formatDateTime';
 
 const WEATHER_ERROR = '날씨 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.';
 const LOCATION_ERROR = '현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.';
@@ -65,6 +66,7 @@ export default function App() {
   const [isManualLocation, setIsManualLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastUpdatedText, setLastUpdatedText] = useState<string | null>(null);
 
   useEffect(() => {
     getRecentSearches().then(setRecentSearches);
@@ -104,6 +106,7 @@ export default function App() {
       console.error(error);
     }
 
+    setLastUpdatedText(formatLastUpdated(new Date()));
     return true;
   };
 
@@ -344,6 +347,7 @@ export default function App() {
             selectedLocation={selectedLocation}
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
+            lastUpdatedText={lastUpdatedText}
           />
 
           <SearchWeatherCard

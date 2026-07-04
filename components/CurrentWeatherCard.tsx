@@ -15,6 +15,7 @@ type Props = {
   selectedLocation?: FavoriteLocation | null;
   isFavorite?: boolean;
   onToggleFavorite?: (location: FavoriteLocation) => void;
+  lastUpdatedText?: string | null;
 };
 
 export default function CurrentWeatherCard({
@@ -29,6 +30,7 @@ export default function CurrentWeatherCard({
   selectedLocation = null,
   isFavorite = false,
   onToggleFavorite,
+  lastUpdatedText = null,
 }: Props) {
   const canFavorite =
     selectedLocation != null &&
@@ -83,6 +85,9 @@ export default function CurrentWeatherCard({
             <Text style={styles.detail}>체감온도 {weather.feelsLike}°C</Text>
             <Text style={styles.detail}>습도 {weather.humidity}%</Text>
             <Text style={styles.detail}>풍속 {weather.windSpeed}m/s</Text>
+            {!isLocationLoading && lastUpdatedText && (
+              <Text style={styles.updatedAt}>마지막 업데이트: {lastUpdatedText}</Text>
+            )}
           </>
         ) : (
           <Text style={styles.condition}>{weatherMessage}</Text>
@@ -166,5 +171,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#8e8e93',
     marginBottom: 4,
+  },
+  updatedAt: {
+    fontSize: 13,
+    color: '#8e8e93',
+    marginTop: 12,
   },
 });
