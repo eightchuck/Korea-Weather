@@ -319,6 +319,7 @@ export default function App() {
       style={styles.scrollView}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
       <View style={styles.header}>
         <Text style={styles.appTitle}>Korea Weather</Text>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getLocationSuggestions, KoreanLocation } from '../data/koreanLocations';
 import { FavoriteLocation } from '../services/favoriteLocations';
@@ -36,6 +36,7 @@ export default function SearchWeatherCard({
   onToggleFavorite,
   onFavoritePress,
 }: Props) {
+  const inputRef = useRef<TextInput>(null);
   const trimmedSearch = searchCity.trim();
 
   const suggestions = useMemo(
@@ -50,6 +51,13 @@ export default function SearchWeatherCard({
     onChangeSearchCity(text);
   };
 
+  const handleClearSearch = () => {
+    onChangeSearchCity('');
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+
   const handleSelectSuggestion = (location: KoreanLocation) => {
     onSearchCity(location.displayName);
   };
@@ -58,13 +66,25 @@ export default function SearchWeatherCard({
     <View style={styles.card}>
       <Text style={styles.label}>도시 검색</Text>
       <View style={styles.searchRow}>
-        <TextInput
-          style={styles.searchInput}
-          value={searchCity}
-          onChangeText={handleChangeText}
-          placeholder="도시명 입력"
-          placeholderTextColor="#8e8e93"
-        />
+        <View style={styles.inputWrapper}>
+          <TextInput
+            ref={inputRef}
+            style={styles.searchInput}
+            value={searchCity}
+            onChangeText={handleChangeText}
+            placeholder="도시명 입력"
+            placeholderTextColor="#8e8e93"
+          />
+          {searchCity.length > 0 && (
+            <Pressable
+              style={styles.clearButton}
+              onPress={handleClearSearch}
+              hitSlop={8}
+            >
+              <Text style={styles.clearButtonText}>✕</Text>
+            </Pressable>
+          )}
+        </View>
         <Pressable style={styles.searchButton} onPress={onSearch}>
           <Text style={styles.searchButtonText}>검색</Text>
         </Pressable>
@@ -144,16 +164,29 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 8,
   },
-  searchInput: {
+  inputWrapper: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e5e5ea',
     borderRadius: 10,
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
     color: '#1c1c1e',
-    marginRight: 8,
+  },
+  clearButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  clearButtonText: {
+    fontSize: 16,
+    color: '#8e8e93',
   },
   searchButton: {
     backgroundColor: '#007aff',
