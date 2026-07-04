@@ -355,7 +355,7 @@ export default function App() {
         keyboardShouldPersistTaps="handled"
       >
       <View style={styles.header}>
-        <Text style={styles.appTitle}>Korea Weather</Text>
+        <Text style={styles.appTitle}>Weather of Daehan</Text>
         <Text style={styles.subtitle}>오늘의 날씨를 확인하세요</Text>
       </View>
 
