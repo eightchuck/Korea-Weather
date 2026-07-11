@@ -361,8 +361,8 @@ export default function App() {
         style={styles.scrollView}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="always"
-        keyboardDismissMode="none"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
       >
       {errorMessage && <ErrorMessage message={errorMessage} />}
 

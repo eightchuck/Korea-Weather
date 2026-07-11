@@ -1,7 +1,9 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
-import { theme } from '../src/styles/theme';
+import WeatherAnimation from '../src/components/WeatherAnimation';
+import { getWeatherHeroBackgroundColor, theme } from '../src/styles/theme';
+import WeatherIcon from './WeatherIcon';
 
 type Props = {
   locationText: string;
@@ -52,10 +54,12 @@ export default function CurrentWeatherCard({
 
   const locationTypeLabel = isManualLocation ? '선택한 위치' : '현재 위치';
   const showHeroRefreshing = isLocationLoading && weather != null;
+  const heroBackgroundColor = getWeatherHeroBackgroundColor(weather?.condition);
 
   return (
     <>
-      <View style={styles.hero}>
+      <View style={[styles.hero, { backgroundColor: heroBackgroundColor }]}>
+        <WeatherAnimation weatherCondition={weather?.condition} />
         <View style={styles.heroContent}>
           <Text style={styles.locationType}>📍 {locationTypeLabel}</Text>
 
@@ -84,7 +88,10 @@ export default function CurrentWeatherCard({
           {weather ? (
             <>
               <Text style={styles.temperature}>{weather.temperature}°</Text>
-              <Text style={styles.condition}>{weather.condition}</Text>
+              <View style={styles.conditionRow}>
+                <WeatherIcon icon={weather.icon} size={30} />
+                <Text style={styles.condition}>{weather.condition}</Text>
+              </View>
               {summaryParts.length > 0 && (
                 <Text style={styles.summary}>{summaryParts.join('  ·  ')}</Text>
               )}
@@ -139,7 +146,6 @@ export default function CurrentWeatherCard({
 
 const styles = StyleSheet.create({
   hero: {
-    backgroundColor: theme.colors.hero,
     borderRadius: theme.radius.xl,
     paddingTop: theme.layout.heroPaddingTop,
     paddingBottom: theme.layout.heroPaddingBottom,
@@ -148,10 +154,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: theme.colors.border,
+    overflow: 'hidden',
+    position: 'relative',
   },
   heroContent: {
     width: '100%',
     alignItems: 'center',
+    zIndex: 1,
   },
   locationType: {
     ...theme.typography.hero.locationType,
@@ -196,10 +205,16 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginBottom: theme.spacing.sm,
   },
+  conditionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.md,
+  },
   condition: {
     ...theme.typography.hero.condition,
     textAlign: 'center',
-    marginBottom: theme.spacing.md,
   },
   summary: {
     ...theme.typography.hero.summary,

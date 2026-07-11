@@ -19,6 +19,45 @@ export const colors = {
   skeleton: '#E5EBF3',
 };
 
+export const weatherHeroBackgroundColors = {
+  clear: '#D6E8F7',
+  clouds: '#E8EDF2',
+  rain: '#DCE5EE',
+  snow: '#ECF3FA',
+  mist: '#F1F3F6',
+  default: '#E6EBF2',
+} as const;
+
+export function getWeatherHeroBackgroundColor(
+  condition: string | null | undefined,
+): string {
+  if (!condition) {
+    return weatherHeroBackgroundColors.default;
+  }
+
+  if (condition === '맑음' || condition.includes('맑음')) {
+    return weatherHeroBackgroundColors.clear;
+  }
+
+  if (condition === '흐림' || condition.includes('흐림')) {
+    return weatherHeroBackgroundColors.clouds;
+  }
+
+  if (condition === '눈' || condition.startsWith('눈')) {
+    return weatherHeroBackgroundColors.snow;
+  }
+
+  if (condition === '비' || condition === '이슬비' || condition.includes('비')) {
+    return weatherHeroBackgroundColors.rain;
+  }
+
+  if (condition === '안개' || condition === '실안개' || condition.includes('안개')) {
+    return weatherHeroBackgroundColors.mist;
+  }
+
+  return weatherHeroBackgroundColors.default;
+}
+
 export const radius = {
   sm: 8,
   md: 12,
@@ -234,6 +273,8 @@ export const shadow = {
 
 export const theme = {
   colors,
+  weatherHeroBackgroundColors,
+  getWeatherHeroBackgroundColor,
   radius,
   spacing,
   fontSize,

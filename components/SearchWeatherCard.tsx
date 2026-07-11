@@ -152,6 +152,11 @@ export default function SearchWeatherCard({
     });
   };
 
+  const handleSubmitSearch = () => {
+    Keyboard.dismiss();
+    onSearch();
+  };
+
   const handleSelectSuggestion = (location: KoreanLocation) => {
     if (searchLoading) return;
     setLoadingSearchSelection(location.displayName);
@@ -177,7 +182,7 @@ export default function SearchWeatherCard({
     <View style={styles.wrapper}>
       <View style={styles.searchWrapper}>
         <View style={styles.searchBar}>
-          <Pressable style={styles.searchIconButton} onPress={onSearch}>
+          <Pressable style={styles.searchIconButton} onPress={handleSubmitSearch}>
             <Text style={styles.searchIcon}>⌕</Text>
           </Pressable>
           <TextInput
@@ -188,8 +193,8 @@ export default function SearchWeatherCard({
             placeholder="도시명 검색"
             placeholderTextColor={theme.colors.subText}
             returnKeyType="search"
-            onSubmitEditing={onSearch}
-            blurOnSubmit={false}
+            onSubmitEditing={handleSubmitSearch}
+            blurOnSubmit
           />
           <Pressable
             style={[styles.clearButton, searchCity.length === 0 && styles.clearButtonHidden]}
@@ -216,7 +221,7 @@ export default function SearchWeatherCard({
             style={styles.resultsScroll}
             contentContainerStyle={styles.resultsScrollContent}
             nestedScrollEnabled
-            keyboardShouldPersistTaps="always"
+            keyboardShouldPersistTaps="handled"
             keyboardDismissMode="none"
             showsVerticalScrollIndicator={false}
           >
