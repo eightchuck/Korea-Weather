@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RecentSearchItem } from '../services/recentSearch';
+import { theme } from '../src/styles/theme';
 
 type Props = {
   recentSearches: RecentSearchItem[];
@@ -41,44 +42,40 @@ export default function RecentSearchList({
 const styles = StyleSheet.create({
   recentList: {
     width: '100%',
-    marginTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5ea',
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 12,
-    marginBottom: 4,
+    marginBottom: theme.spacing.sm,
   },
   sectionTitle: {
-    fontSize: 14,
-    color: '#8e8e93',
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.subText,
   },
   clearAllButton: {
-    fontSize: 14,
-    color: '#ff3b30',
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.danger,
   },
   recentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingVertical: 12,
+    paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f2f2f7',
+    borderBottomColor: theme.colors.divider,
   },
   recentMain: {
     flex: 1,
   },
   listText: {
-    fontSize: 16,
-    color: '#1c1c1e',
+    fontSize: theme.fontSize.body,
+    color: theme.colors.text,
   },
   removeButton: {
     fontSize: 18,
-    color: '#8e8e93',
-    paddingHorizontal: 8,
+    color: theme.colors.subText,
+    paddingHorizontal: theme.spacing.sm,
   },
 });

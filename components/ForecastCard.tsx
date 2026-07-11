@@ -1,5 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { HourlyWeatherItem } from '../services/weather';
+import { theme } from '../src/styles/theme';
+import SectionHeader from './SectionHeader';
 import WeatherIcon from './WeatherIcon';
 
 type Props = {
@@ -10,61 +12,65 @@ export default function ForecastCard({ hourlyWeather }: Props) {
   if (hourlyWeather.length === 0) return null;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.label}>3시간 예보</Text>
-      {hourlyWeather.map((item, index) => (
-        <View key={index} style={styles.row}>
-          <Text style={styles.hour}>{item.hour}</Text>
-          <View style={styles.weatherInfo}>
-            <WeatherIcon icon={item.icon} size={40} />
-            <Text style={styles.weatherText}>
-              {item.temperature}° · {item.condition}
-            </Text>
+    <View style={styles.section}>
+      <SectionHeader title="시간별 예보" />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {hourlyWeather.map((item, index) => (
+          <View
+            key={index}
+            style={[styles.hourCard, index === 0 && styles.hourCardCurrent]}
+          >
+            <Text style={styles.hour}>{index === 0 ? '지금' : item.hour}</Text>
+            <View style={styles.iconArea}>
+              <WeatherIcon icon={item.icon} size={theme.layout.hourlyIconSize} />
+            </View>
+            <Text style={styles.temperature}>{item.temperature}°</Text>
           </View>
-        </View>
-      ))}
+        ))}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+  section: {
+    marginBottom: theme.layout.cardGap,
   },
-  label: {
-    fontSize: 14,
-    color: '#8e8e93',
-    marginBottom: 12,
+  scrollContent: {
+    gap: theme.layout.hourlyCardGap,
   },
-  row: {
-    flexDirection: 'row',
+  hourCard: {
+    width: theme.layout.hourlyCardWidth,
+    height: theme.layout.hourlyCardHeight,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.md,
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 8,
-    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadow.hourlyCard,
+  },
+  hourCardCurrent: {
+    backgroundColor: theme.colors.primaryTint,
+    borderColor: theme.colors.primaryBorder,
   },
   hour: {
-    fontSize: 16,
-    color: '#1c1c1e',
-    width: 48,
+    ...theme.typography.hourly.time,
+    textAlign: 'center',
   },
-  weatherInfo: {
-    flex: 1,
-    flexDirection: 'row',
+  iconArea: {
+    width: '100%',
+    height: theme.layout.hourlyIconAreaHeight,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
-  weatherText: {
-    fontSize: 15,
-    color: '#1c1c1e',
+  temperature: {
+    ...theme.typography.hourly.temperature,
+    textAlign: 'center',
   },
 });

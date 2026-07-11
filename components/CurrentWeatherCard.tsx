@@ -1,8 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
 import { theme } from '../src/styles/theme';
-import WeatherIcon from './WeatherIcon';
 
 type Props = {
   locationText: string;
@@ -17,6 +16,8 @@ type Props = {
   isFavorite?: boolean;
   onToggleFavorite?: (location: FavoriteLocation) => void;
   lastUpdatedText?: string | null;
+  forecastHigh?: number | null;
+  forecastLow?: number | null;
 };
 
 export default function CurrentWeatherCard({
@@ -32,34 +33,80 @@ export default function CurrentWeatherCard({
   isFavorite = false,
   onToggleFavorite,
   lastUpdatedText = null,
+  forecastHigh = null,
+  forecastLow = null,
 }: Props) {
+  const summaryParts = weather
+    ? [
+        `체감 ${weather.feelsLike}°`,
+        forecastHigh != null ? `최고 ${forecastHigh}°` : null,
+        forecastLow != null ? `최저 ${forecastLow}°` : null,
+      ].filter(Boolean)
+    : [];
+
   const canFavorite =
     selectedLocation != null &&
     selectedLocation.name.length > 0 &&
     selectedLocation.lat != null &&
     selectedLocation.lon != null;
 
+  const locationTypeLabel = isManualLocation ? '선택한 위치' : '현재 위치';
+  const showHeroRefreshing = isLocationLoading && weather != null;
+
   return (
     <>
-      <View style={styles.card}>
-        <View style={styles.locationHeader}>
-          <Text style={styles.label}>
-            {isManualLocation ? '📍 선택한 위치' : '📍 현재 위치'}
-          </Text>
-          {canFavorite && onToggleFavorite && (
-            <Pressable onPress={() => onToggleFavorite(selectedLocation)}>
-              <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
-            </Pressable>
+      <View style={styles.hero}>
+        <View style={styles.heroContent}>
+          <Text style={styles.locationType}>📍 {locationTypeLabel}</Text>
+
+          <View style={styles.locationNameSection}>
+            <Text style={styles.locationName} numberOfLines={2}>
+              {locationText}
+            </Text>
+            {canFavorite && onToggleFavorite && (
+              <Pressable
+                style={styles.favoriteButton}
+                onPress={() => onToggleFavorite(selectedLocation)}
+                hitSlop={4}
+              >
+                <Text
+                  style={[
+                    styles.favoriteIcon,
+                    isFavorite ? styles.favoriteIconActive : styles.favoriteIconInactive,
+                  ]}
+                >
+                  {isFavorite ? '★' : '☆'}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+
+          {weather ? (
+            <>
+              <Text style={styles.temperature}>{weather.temperature}°</Text>
+              <Text style={styles.condition}>{weather.condition}</Text>
+              {summaryParts.length > 0 && (
+                <Text style={styles.summary}>{summaryParts.join('  ·  ')}</Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.condition}>{weatherMessage}</Text>
           )}
         </View>
-        <Text style={styles.location}>{locationText}</Text>
+
+        <View style={styles.heroExtension} />
+
         <View style={styles.buttonRow}>
           <Pressable
             style={[styles.actionButton, isLocationLoading && styles.actionButtonDisabled]}
             onPress={onReturnToCurrentLocation}
             disabled={isLocationLoading}
           >
-            <Text style={styles.actionButtonText}>현재 위치</Text>
+            {showHeroRefreshing ? (
+              <ActivityIndicator size="small" color={theme.colors.card} />
+            ) : (
+              <Text style={styles.actionButtonText}>현재 위치</Text>
+            )}
           </Pressable>
           <Pressable
             style={[
@@ -70,73 +117,112 @@ export default function CurrentWeatherCard({
             onPress={onRefresh}
             disabled={isLocationLoading || !canRefresh}
           >
-            <Text style={styles.actionButtonText}>새로고침</Text>
+            {showHeroRefreshing ? (
+              <ActivityIndicator size="small" color={theme.colors.card} />
+            ) : (
+              <Text style={styles.actionButtonText}>새로고침</Text>
+            )}
           </Pressable>
         </View>
-      </View>
 
-      <View style={styles.card}>
-        {weather ? (
-          <>
-            <View style={styles.weatherRow}>
-              <WeatherIcon icon={weather.icon} size={80} />
-              <Text style={styles.temperature}>{weather.temperature}°C</Text>
-            </View>
-            <Text style={styles.condition}>{weather.condition}</Text>
-            <Text style={styles.detail}>체감온도 {weather.feelsLike}°C</Text>
-            <Text style={styles.detail}>습도 {weather.humidity}%</Text>
-            <Text style={styles.detail}>풍속 {weather.windSpeed}m/s</Text>
-            {!isLocationLoading && lastUpdatedText && (
-              <Text style={styles.updatedAt}>마지막 업데이트: {lastUpdatedText}</Text>
-            )}
-          </>
-        ) : (
-          <Text style={styles.condition}>{weatherMessage}</Text>
-        )}
+        <View style={styles.footerStatusSlot}>
+          {showHeroRefreshing ? (
+            <Text style={styles.updatingStatus}>최신 날씨를 업데이트하고 있어요</Text>
+          ) : lastUpdatedText ? (
+            <Text style={styles.updatedAt}>마지막 업데이트: {lastUpdatedText}</Text>
+          ) : null}
+        </View>
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.xl,
-    marginBottom: theme.spacing.lg,
+  hero: {
+    backgroundColor: theme.colors.hero,
+    borderRadius: theme.radius.xl,
+    paddingTop: theme.layout.heroPaddingTop,
+    paddingBottom: theme.layout.heroPaddingBottom,
+    paddingHorizontal: theme.layout.cardPadding,
+    marginBottom: theme.layout.cardGap,
     alignItems: 'center',
-    ...theme.shadow.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
-  label: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.subText,
-  },
-  starButton: {
-    fontSize: theme.fontSize.subtitle,
-    color: theme.colors.warning,
-  },
-  locationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  heroContent: {
     width: '100%',
+    alignItems: 'center',
+  },
+  locationType: {
+    ...theme.typography.hero.locationType,
+    textAlign: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  locationNameSection: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    paddingHorizontal: theme.layout.favoriteTouchSize / 2,
+    marginBottom: theme.spacing.lg,
+  },
+  locationName: {
+    ...theme.typography.hero.locationName,
+    textAlign: 'center',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    marginTop: -(theme.layout.favoriteTouchSize / 2),
+    width: theme.layout.favoriteTouchSize,
+    height: theme.layout.favoriteTouchSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteIcon: {
+    fontSize: theme.layout.favoriteIconSize,
+    lineHeight: theme.layout.favoriteIconSize + 2,
+  },
+  favoriteIconInactive: {
+    color: theme.colors.textSecondary,
+  },
+  favoriteIconActive: {
+    color: theme.colors.primary,
+  },
+  temperature: {
+    ...theme.typography.hero.temperature,
+    textAlign: 'center',
+    letterSpacing: -1,
     marginBottom: theme.spacing.sm,
   },
-  location: {
-    fontSize: theme.fontSize.subtitle,
-    fontWeight: '600',
-    color: theme.colors.text,
+  condition: {
+    ...theme.typography.hero.condition,
+    textAlign: 'center',
     marginBottom: theme.spacing.md,
+  },
+  summary: {
+    ...theme.typography.hero.summary,
+    textAlign: 'center',
+  },
+  heroExtension: {
+    width: '100%',
+    minHeight: 0,
   },
   buttonRow: {
     flexDirection: 'row',
     gap: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   actionButton: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.full,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
+    minWidth: 88,
+    minHeight: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   refreshButton: {
     backgroundColor: theme.colors.success,
@@ -146,32 +232,21 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: theme.colors.card,
-    fontSize: 15,
+    fontSize: theme.fontSize.caption,
     fontWeight: '600',
-  },
-  temperature: {
-    fontSize: theme.fontSize.temperature,
-    fontWeight: '300',
-    color: theme.colors.text,
-  },
-  weatherRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  condition: {
-    fontSize: theme.fontSize.subtitle,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
-  },
-  detail: {
-    fontSize: 15,
-    color: theme.colors.subText,
-    marginBottom: theme.spacing.xs,
   },
   updatedAt: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.subText,
+    textAlign: 'center',
+  },
+  footerStatusSlot: {
+    minHeight: 18,
     marginTop: theme.spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updatingStatus: {
+    ...theme.typography.loading.heroUpdating,
   },
 });

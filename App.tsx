@@ -6,11 +6,12 @@ import CityWeatherList from './components/CityWeatherList';
 import CurrentWeatherCard from './components/CurrentWeatherCard';
 import ErrorMessage from './components/ErrorMessage';
 import ForecastCard from './components/ForecastCard';
-import LoadingMessage from './components/LoadingMessage';
+import InitialLoadingView from './components/InitialLoadingView';
 import SearchResultCard from './components/SearchResultCard';
 import SearchWeatherCard from './components/SearchWeatherCard';
 import Toast from './components/Toast';
 import WeeklyForecastCard from './components/WeeklyForecastCard';
+import WeatherStatsCard from './components/WeatherStatsCard';
 import {
   FavoriteLocation,
   getFavoriteLocations,
@@ -346,6 +347,7 @@ export default function App() {
     : false;
 
   const showInitialLoading = isLoading && !weather;
+  const todayForecast = weeklyWeather[0];
 
   return (
     <View style={styles.app}>
@@ -353,21 +355,13 @@ export default function App() {
         style={styles.scrollView}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
       >
-      <View style={styles.header}>
-        <Text style={styles.appTitle}>Weather of Daehan</Text>
-        <Text style={styles.subtitle}>오늘의 날씨를 확인하세요</Text>
-      </View>
-
       {errorMessage && <ErrorMessage message={errorMessage} />}
 
-      {isLoading && !showInitialLoading && (
-        <LoadingMessage message="날씨 정보를 불러오는 중입니다..." />
-      )}
-
       {showInitialLoading ? (
-        <LoadingMessage />
+        <InitialLoadingView />
       ) : (
         <>
           <CurrentWeatherCard
@@ -383,6 +377,8 @@ export default function App() {
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
             lastUpdatedText={lastUpdatedText}
+            forecastHigh={todayForecast?.maxTemp ?? null}
+            forecastLow={todayForecast?.minTemp ?? null}
           />
 
           <SearchWeatherCard
@@ -400,6 +396,8 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             onFavoritePress={handleFavoritePress}
           />
+
+          {weather && <WeatherStatsCard weather={weather} />}
 
           {isManualLocation && selectedLocation && weather && (
             <SearchResultCard
@@ -435,21 +433,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    paddingTop: 60,
-    paddingHorizontal: theme.spacing.xl,
+    paddingTop: 56,
+    paddingHorizontal: theme.layout.screenPadding,
     paddingBottom: 48,
-  },
-  header: {
-    marginBottom: theme.spacing.xxl,
-  },
-  appTitle: {
-    fontSize: theme.fontSize.title,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
-  },
-  subtitle: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.subText,
   },
 });

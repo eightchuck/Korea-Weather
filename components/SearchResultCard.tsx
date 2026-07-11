@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { CurrentWeather } from '../services/weather';
+import { theme } from '../src/styles/theme';
 import WeatherIcon from './WeatherIcon';
 
 type Props = {
@@ -37,39 +38,37 @@ export default function SearchResultCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.xl,
+    padding: theme.layout.cardPadding,
+    marginBottom: theme.layout.cardGap,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadow.soft,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   label: {
-    fontSize: 14,
-    color: '#8e8e93',
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.subText,
   },
   starButton: {
     fontSize: 24,
-    color: '#ff9500',
+    color: theme.colors.warning,
   },
   location: {
-    fontSize: 20,
+    fontSize: theme.fontSize.subtitle,
     fontWeight: '600',
-    color: '#1c1c1e',
-    marginBottom: 6,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
   },
   weather: {
-    fontSize: 16,
-    color: '#3a3a3c',
+    fontSize: theme.fontSize.body,
+    color: theme.colors.text,
     flex: 1,
   },
   weatherRow: {
