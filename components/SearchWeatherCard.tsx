@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Keyboard,
   LayoutAnimation,
@@ -29,6 +30,11 @@ const RESULTS_ANIMATION_IN_MS = 220;
 const RESULTS_ANIMATION_OUT_MS = 180;
 const RESULTS_SLIDE_OFFSET = 10;
 const MIN_EMPTY_QUERY_LENGTH = 2;
+const ROW_LOADING_OPACITY = 0.8;
+
+function getFavoriteKey(location: FavoriteLocation) {
+  return `${location.name}-${location.lat}-${location.lon}`;
+}
 
 function getLocationDisplayParts(displayName: string): { title: string; subtitle: string | null } {
   const parts = displayName.trim().split(/\s+/);
@@ -56,6 +62,7 @@ type Props = {
   favoriteLocations: FavoriteLocation[];
   onToggleFavorite: (location: FavoriteLocation) => void;
   onFavoritePress: (location: FavoriteLocation) => void;
+  loadingFavoriteKey?: string | null;
 };
 
 export default function SearchWeatherCard({
@@ -72,9 +79,11 @@ export default function SearchWeatherCard({
   favoriteLocations,
   onToggleFavorite,
   onFavoritePress,
+  loadingFavoriteKey = null,
 }: Props) {
   const inputRef = useRef<TextInput>(null);
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
+  const [loadingSearchSelection, setLoadingSearchSelection] = useState<string | null>(null);
   const resultsOpacity = useRef(new Animated.Value(0)).current;
   const resultsTranslateY = useRef(new Animated.Value(-RESULTS_SLIDE_OFFSET)).current;
   const trimmedSearch = searchCity.trim();
@@ -126,6 +135,12 @@ export default function SearchWeatherCard({
     ]).start();
   }, [shouldShowResults, resultsOpacity, resultsTranslateY]);
 
+  useEffect(() => {
+    if (!searchLoading) {
+      setLoadingSearchSelection(null);
+    }
+  }, [searchLoading]);
+
   const handleChangeText = (text: string) => {
     onChangeSearchCity(text);
   };
@@ -138,6 +153,8 @@ export default function SearchWeatherCard({
   };
 
   const handleSelectSuggestion = (location: KoreanLocation) => {
+    if (searchLoading) return;
+    setLoadingSearchSelection(location.displayName);
     Keyboard.dismiss();
     onSearchCity(location.displayName);
   };
@@ -206,21 +223,31 @@ export default function SearchWeatherCard({
             {showSuggestions &&
               suggestions.map((location, index) => {
                 const { title, subtitle } = getLocationDisplayParts(location.displayName);
+                const isRowLoading =
+                  searchLoading && loadingSearchSelection === location.displayName;
 
                 return (
                   <View key={location.displayName}>
                     <Pressable
                       style={({ pressed }) => [
                         styles.resultRow,
-                        pressed && styles.resultRowPressed,
+                        isRowLoading && styles.resultRowLoading,
+                        pressed && !isRowLoading && styles.resultRowPressed,
                       ]}
                       onPress={() => handleSelectSuggestion(location)}
+                      disabled={isRowLoading}
                     >
                       <View style={styles.resultTextBlock}>
                         <Text style={styles.resultTitle}>{title}</Text>
                         {subtitle ? <Text style={styles.resultRegion}>{subtitle}</Text> : null}
                       </View>
-                      <Text style={styles.chevron}>›</Text>
+                      <View style={styles.rowActionSlot}>
+                        {isRowLoading ? (
+                          <ActivityIndicator size="small" color={theme.colors.primary} />
+                        ) : (
+                          <Text style={styles.chevron}>›</Text>
+                        )}
+                      </View>
                     </Pressable>
                     {index < suggestions.length - 1 && <View style={styles.resultDivider} />}
                   </View>
@@ -266,19 +293,38 @@ export default function SearchWeatherCard({
           )}
         </View>
         {showFavoriteList &&
-          favoriteLocations.map((item) => (
-            <View key={`${item.name}-${item.lat}-${item.lon}`} style={styles.favoriteRow}>
-              <Pressable style={styles.favoriteMain} onPress={() => onFavoritePress(item)}>
-                <Text style={styles.listText}>{item.name}</Text>
-              </Pressable>
-              <Pressable onPress={() => onToggleFavorite(item)}>
-                <Text style={styles.starActive}>★</Text>
-              </Pressable>
-            </View>
-          ))}
+          favoriteLocations.map((item) => {
+            const itemKey = getFavoriteKey(item);
+            const isRowLoading = searchLoading && loadingFavoriteKey === itemKey;
+
+            return (
+              <View
+                key={itemKey}
+                style={[styles.favoriteRow, isRowLoading && styles.resultRowLoading]}
+              >
+                <Pressable
+                  style={styles.favoriteMain}
+                  onPress={() => onFavoritePress(item)}
+                  disabled={isRowLoading}
+                >
+                  <Text style={styles.listText}>{item.name}</Text>
+                </Pressable>
+                <View style={styles.rowActionSlot}>
+                  {isRowLoading ? (
+                    <ActivityIndicator size="small" color={theme.colors.primary} />
+                  ) : null}
+                </View>
+                <Pressable onPress={() => onToggleFavorite(item)}>
+                  <Text style={styles.starActive}>★</Text>
+                </Pressable>
+              </View>
+            );
+          })}
       </View>
 
-      {searchLoading && <Text style={styles.detail}>검색 중...</Text>}
+      {searchLoading && !loadingSearchSelection && (
+        <Text style={styles.detail}>검색 중...</Text>
+      )}
       {searchError ? <Text style={styles.searchError}>{searchError}</Text> : null}
     </View>
   );
@@ -379,6 +425,9 @@ const styles = StyleSheet.create({
   resultRowPressed: {
     backgroundColor: theme.colors.primaryTint,
   },
+  resultRowLoading: {
+    opacity: ROW_LOADING_OPACITY,
+  },
   resultTextBlock: {
     flex: 1,
     justifyContent: 'center',
@@ -396,6 +445,12 @@ const styles = StyleSheet.create({
     lineHeight: theme.layout.searchResultChevronSize + 2,
     color: theme.colors.textSecondary,
     fontWeight: '400',
+  },
+  rowActionSlot: {
+    width: theme.layout.rowActionSize,
+    height: theme.layout.rowActionSize,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   resultDivider: {
     height: 1,

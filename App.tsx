@@ -71,7 +71,11 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [loadingFavoriteKey, setLoadingFavoriteKey] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const getFavoriteKey = (location: FavoriteLocation) =>
+    `${location.name}-${location.lat}-${location.lon}`;
 
   const showToast = (message: string) => {
     if (toastTimerRef.current) {
@@ -257,6 +261,7 @@ export default function App() {
     } finally {
       setIsLoading(false);
       setSearchLoading(false);
+      setLoadingFavoriteKey(null);
     }
   };
 
@@ -326,6 +331,7 @@ export default function App() {
   };
 
   const handleFavoritePress = (location: FavoriteLocation) => {
+    setLoadingFavoriteKey(getFavoriteKey(location));
     applyLocationSearch(location);
   };
 
@@ -395,6 +401,7 @@ export default function App() {
             favoriteLocations={favoriteLocations}
             onToggleFavorite={handleToggleFavorite}
             onFavoritePress={handleFavoritePress}
+            loadingFavoriteKey={loadingFavoriteKey}
           />
 
           {weather && <WeatherStatsCard weather={weather} />}

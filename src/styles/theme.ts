@@ -78,6 +78,7 @@ export const layout = {
   searchResultPaddingVertical: 14,
   searchResultChevronSize: 19,
   searchResultsMaxHeight: 340,
+  rowActionSize: 22,
 };
 
 export const typography = {
