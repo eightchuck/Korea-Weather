@@ -16,6 +16,7 @@ export const colors = {
   hero: '#EAF3FC',
   primaryTint: 'rgba(74, 144, 226, 0.07)',
   primaryBorder: 'rgba(74, 144, 226, 0.22)',
+  skeleton: '#E5EBF3',
 };
 
 export const radius = {

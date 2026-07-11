@@ -6,7 +6,7 @@ import CityWeatherList from './components/CityWeatherList';
 import CurrentWeatherCard from './components/CurrentWeatherCard';
 import ErrorMessage from './components/ErrorMessage';
 import ForecastCard from './components/ForecastCard';
-import InitialLoadingView from './components/InitialLoadingView';
+import WeatherSkeleton from './src/components/WeatherSkeleton';
 import SearchResultCard from './components/SearchResultCard';
 import SearchWeatherCard from './components/SearchWeatherCard';
 import Toast from './components/Toast';
@@ -367,7 +367,7 @@ export default function App() {
       {errorMessage && <ErrorMessage message={errorMessage} />}
 
       {showInitialLoading ? (
-        <InitialLoadingView />
+        <WeatherSkeleton />
       ) : (
         <>
           <CurrentWeatherCard
