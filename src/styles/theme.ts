@@ -18,6 +18,8 @@ export const colors = {
   heroActionBorder: 'rgba(255, 255, 255, 0.62)',
   emptyStateSurface: 'rgba(74, 144, 226, 0.04)',
   emptyStateBorder: 'rgba(0, 0, 0, 0.04)',
+  errorSurface: 'rgba(239, 68, 68, 0.05)',
+  errorBorder: 'rgba(239, 68, 68, 0.12)',
   primaryTint: 'rgba(74, 144, 226, 0.07)',
   primaryBorder: 'rgba(74, 144, 226, 0.22)',
   skeleton: '#E5EBF3',
@@ -128,6 +130,7 @@ export const layout = {
   rowActionSize: 22,
   emptyStateIconSize: 22,
   emptyStatePaddingVertical: 20,
+  errorActionMinHeight: 44,
 };
 
 export const typography = {
@@ -260,6 +263,31 @@ export const typography = {
       color: colors.textSecondary,
       textAlign: 'center' as const,
       lineHeight: 18,
+    },
+  },
+  errorState: {
+    icon: {
+      fontSize: layout.emptyStateIconSize,
+      color: colors.textSecondary,
+      textAlign: 'center' as const,
+    },
+    title: {
+      fontSize: fontSize.body,
+      fontWeight: '600' as const,
+      color: colors.text,
+      textAlign: 'center' as const,
+    },
+    description: {
+      fontSize: fontSize.caption,
+      fontWeight: '400' as const,
+      color: colors.textSecondary,
+      textAlign: 'center' as const,
+      lineHeight: 18,
+    },
+    buttonText: {
+      fontSize: fontSize.caption,
+      fontWeight: '600' as const,
+      color: colors.card,
     },
   },
   loading: {

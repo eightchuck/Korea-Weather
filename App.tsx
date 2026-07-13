@@ -4,7 +4,11 @@ import * as Location from 'expo-location';
 import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native';
 import CityWeatherList from './components/CityWeatherList';
 import CurrentWeatherCard from './components/CurrentWeatherCard';
-import ErrorMessage from './components/ErrorMessage';
+import ErrorMessage, {
+  ErrorMessages,
+  isNetworkError,
+  resolveErrorType,
+} from './components/ErrorMessage';
 import ForecastCard from './components/ForecastCard';
 import WeatherSkeleton from './src/components/WeatherSkeleton';
 import SearchResultCard from './components/SearchResultCard';
@@ -39,9 +43,6 @@ import {
 } from './services/weather';
 import { formatLastUpdated } from './utils/formatDateTime';
 import { theme } from './src/styles/theme';
-
-const WEATHER_ERROR = '날씨 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.';
-const LOCATION_ERROR = '현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.';
 
 function formatAddress(address: Location.LocationGeocodedAddress) {
   const region = address.region;
@@ -117,7 +118,7 @@ export default function App() {
       console.error(error);
       setWeather(null);
       setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-      setErrorMessage(WEATHER_ERROR);
+      setErrorMessage(isNetworkError(error) ? ErrorMessages.network : ErrorMessages.weather);
       return false;
     }
 
@@ -149,7 +150,7 @@ export default function App() {
       if (status !== 'granted') {
         setLocationText('위치 권한이 필요합니다');
         setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-        setErrorMessage(LOCATION_ERROR);
+        setErrorMessage(ErrorMessages.location);
         return false;
       }
 
@@ -160,7 +161,7 @@ export default function App() {
         console.error(error);
         setLocationText('위치를 가져올 수 없습니다');
         setWeatherMessage('날씨 정보를 가져오지 못했습니다');
-        setErrorMessage(LOCATION_ERROR);
+        setErrorMessage(ErrorMessages.location);
         return false;
       }
 
@@ -305,7 +306,7 @@ export default function App() {
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage(WEATHER_ERROR);
+      setErrorMessage(isNetworkError(error) ? ErrorMessages.network : ErrorMessages.weather);
       setSearchError('도시를 찾을 수 없습니다.');
     } finally {
       setIsLoading(false);
@@ -368,7 +369,22 @@ export default function App() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
       >
-      {errorMessage && <ErrorMessage message={errorMessage} />}
+      {errorMessage && !showInitialLoading ? (
+        <ErrorMessage
+          type={resolveErrorType(errorMessage)}
+          onRetry={() => {
+            if (errorMessage === ErrorMessages.location) {
+              handleReturnToCurrentLocation();
+              return;
+            }
+            if (selectedLocation) {
+              handleRefresh();
+              return;
+            }
+            handleReturnToCurrentLocation();
+          }}
+        />
+      ) : null}
 
       {showInitialLoading ? (
         <WeatherSkeleton />

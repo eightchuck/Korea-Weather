@@ -18,6 +18,7 @@ import { FavoriteLocation } from '../services/favoriteLocations';
 import { RecentSearchItem } from '../services/recentSearch';
 import { theme } from '../src/styles/theme';
 import EmptyState from './EmptyState';
+import ErrorMessage from './ErrorMessage';
 import RecentSearchList from './RecentSearchList';
 
 if (
@@ -341,7 +342,20 @@ export default function SearchWeatherCard({
       {searchLoading && !loadingSearchSelection && (
         <Text style={styles.detail}>검색 중...</Text>
       )}
-      {searchError ? <Text style={styles.searchError}>{searchError}</Text> : null}
+      {searchError ? (
+        <ErrorMessage
+          type="api"
+          title={searchError}
+          description={
+            searchError === '도시명을 입력해주세요.'
+              ? ''
+              : searchError === '도시를 찾을 수 없습니다.'
+                ? '다른 지역명으로 다시 검색해 보세요.'
+                : '잠시 후 다시 시도해 주세요.'
+          }
+          compact
+        />
+      ) : null}
     </View>
   );
 }
@@ -477,12 +491,6 @@ const styles = StyleSheet.create({
   detail: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.subText,
-    marginTop: theme.spacing.sm,
-    textAlign: 'center',
-  },
-  searchError: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.danger,
     marginTop: theme.spacing.sm,
     textAlign: 'center',
   },
