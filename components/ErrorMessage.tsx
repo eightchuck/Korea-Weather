@@ -67,9 +67,13 @@ export default function ErrorMessage({
   return (
     <View style={[styles.card, compact && styles.cardCompact]}>
       <Text style={styles.icon}>{content.icon}</Text>
-      <Text style={styles.title}>{displayTitle}</Text>
+      <Text style={styles.title} numberOfLines={2}>
+        {displayTitle}
+      </Text>
       {displayDescription ? (
-        <Text style={styles.description}>{displayDescription}</Text>
+        <Text style={styles.description} numberOfLines={3}>
+          {displayDescription}
+        </Text>
       ) : null}
       {onRetry ? (
         <Pressable

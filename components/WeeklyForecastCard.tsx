@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: theme.layout.weeklyRowHeight,
+    height: theme.layout.listRowHeight,
   },
   day: {
     ...theme.typography.weekly.day,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   iconArea: {
     width: theme.layout.weeklyIconAreaWidth,
-    height: theme.layout.weeklyRowHeight,
+    height: theme.layout.listRowHeight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -89,8 +89,6 @@ const styles = StyleSheet.create({
     ...theme.typography.weekly.maxTemp,
   },
   divider: {
-    height: 1,
-    backgroundColor: theme.colors.divider,
-    opacity: 0.7,
+    ...theme.divider.line,
   },
 });

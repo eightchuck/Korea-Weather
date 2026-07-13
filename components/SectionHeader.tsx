@@ -15,13 +15,9 @@ export default function SectionHeader({ title }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: theme.spacing.sectionTop,
     marginBottom: theme.spacing.sectionBottom,
   },
   title: {
-    fontSize: theme.fontSize.sectionHeader,
-    fontWeight: '600',
-    color: theme.colors.text,
-    textAlign: 'left',
+    ...theme.typography.section.title,
   },
 });

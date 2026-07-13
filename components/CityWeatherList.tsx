@@ -21,7 +21,9 @@ export default function CityWeatherList({ cityWeatherList, showEmpty = false }: 
           {cityWeatherList.map((item, index) => (
             <View key={index}>
               <View style={styles.row}>
-                <Text style={styles.city}>{item.city}</Text>
+                <Text style={styles.city} numberOfLines={1} ellipsizeMode="tail">
+                  {item.city}
+                </Text>
                 <View style={styles.iconArea}>
                   <WeatherIcon icon={item.icon} size={theme.layout.cityIconSize} />
                 </View>
@@ -61,15 +63,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: theme.layout.cityRowHeight,
+    height: theme.layout.listRowHeight,
   },
   city: {
     ...theme.typography.city.name,
-    minWidth: 44,
+    flex: 1,
+    minWidth: 0,
   },
   iconArea: {
     width: theme.layout.cityIconAreaWidth,
-    height: theme.layout.cityRowHeight,
+    height: theme.layout.listRowHeight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -82,8 +85,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   divider: {
-    height: 1,
-    backgroundColor: theme.colors.divider,
-    opacity: 0.7,
+    ...theme.divider.line,
   },
 });

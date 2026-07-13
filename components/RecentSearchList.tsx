@@ -38,7 +38,9 @@ export default function RecentSearchList({
             ]}
             onPress={() => onRecentSearchPress(item)}
           >
-            <Text style={styles.listText}>{item.name}</Text>
+            <Text style={styles.listText} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -68,11 +70,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.subText,
+    ...theme.typography.section.inCardCaption,
   },
   clearAllButton: {
-    fontSize: theme.fontSize.caption,
+    ...theme.typography.label,
     color: theme.colors.danger,
   },
   clearAllButtonWrap: {
@@ -82,14 +83,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingVertical: theme.spacing.md,
+    minHeight: theme.layout.listRowHeight,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.divider,
   },
   recentMain: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: theme.layout.heroActionMinSize,
+    minWidth: 0,
+    minHeight: theme.layout.listRowHeight,
   },
   rowPressed: {
     backgroundColor: theme.colors.primaryTint,
@@ -98,8 +100,8 @@ const styles = StyleSheet.create({
     opacity: theme.interaction.pressedOpacity,
   },
   listText: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text,
+    ...theme.typography.weekly.day,
+    flexShrink: 1,
   },
   removeButton: {
     fontSize: 18,

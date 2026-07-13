@@ -81,7 +81,7 @@ export const spacing = {
   xl: 20,
   xxl: 32,
   sectionTop: 24,
-  sectionBottom: 12,
+  sectionBottom: 10,
 };
 
 export const fontSize = {
@@ -112,14 +112,15 @@ export const layout = {
   heroActionMinSize: 44,
   hourlyCardWidth: 72,
   hourlyCardHeight: 110,
-  hourlyCardGap: 11,
+  hourlyCardGap: 12,
   hourlyIconSize: 32,
   hourlyIconAreaHeight: 34,
-  weeklyRowHeight: 62,
+  listRowHeight: 60,
+  weeklyRowHeight: 60,
   weeklyIconSize: 32,
   weeklyIconAreaWidth: 40,
   weeklyDayWidth: 28,
-  cityRowHeight: 58,
+  cityRowHeight: 60,
   cityIconSize: 32,
   cityIconAreaWidth: 40,
   searchResultRowHeight: 64,
@@ -138,6 +139,36 @@ export const interaction = {
 } as const;
 
 export const typography = {
+  section: {
+    title: {
+      fontSize: fontSize.sectionHeader,
+      fontWeight: '600' as const,
+      color: colors.text,
+      letterSpacing: -0.2,
+    },
+    inCardTitle: {
+      fontSize: fontSize.body,
+      fontWeight: '600' as const,
+      color: colors.text,
+    },
+    inCardCaption: {
+      fontSize: fontSize.caption,
+      fontWeight: '500' as const,
+      color: colors.textSecondary,
+    },
+  },
+  label: {
+    fontSize: fontSize.caption,
+    fontWeight: '400' as const,
+    color: colors.textSecondary,
+  },
+  button: {
+    label: {
+      fontSize: fontSize.caption,
+      fontWeight: '600' as const,
+      letterSpacing: 0.1,
+    },
+  },
   inputPlaceholder: {
     fontSize: fontSize.body,
     fontWeight: '400' as const,
@@ -220,7 +251,7 @@ export const typography = {
       color: colors.text,
     },
     temperature: {
-      fontSize: fontSize.sectionHeader,
+      fontSize: fontSize.body,
       fontWeight: '600' as const,
       color: colors.text,
     },
@@ -321,6 +352,14 @@ export const typography = {
   },
 };
 
+export const divider = {
+  line: {
+    height: 1,
+    backgroundColor: colors.divider,
+    opacity: 0.7,
+  } satisfies ViewStyle,
+};
+
 export const shadow = {
   card: {
     shadowColor: '#000',
@@ -362,6 +401,7 @@ export const theme = {
   fontSize,
   layout,
   typography,
+  divider,
   shadow,
 };
 

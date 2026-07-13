@@ -255,8 +255,14 @@ export default function SearchWeatherCard({
                       disabled={isRowLoading}
                     >
                       <View style={styles.resultTextBlock}>
-                        <Text style={styles.resultTitle}>{title}</Text>
-                        {subtitle ? <Text style={styles.resultRegion}>{subtitle}</Text> : null}
+                        <Text style={styles.resultTitle} numberOfLines={1} ellipsizeMode="tail">
+                          {title}
+                        </Text>
+                        {subtitle ? (
+                          <Text style={styles.resultRegion} numberOfLines={1} ellipsizeMode="tail">
+                            {subtitle}
+                          </Text>
+                        ) : null}
                       </View>
                       <View style={styles.rowActionSlot}>
                         {isRowLoading ? (
@@ -340,7 +346,9 @@ export default function SearchWeatherCard({
                   onPress={() => onFavoritePress(item)}
                   disabled={isRowLoading}
                 >
-                  <Text style={styles.listText}>{item.name}</Text>
+                  <Text style={styles.listText} numberOfLines={1} ellipsizeMode="tail">
+                    {item.name}
+                  </Text>
                 </Pressable>
                 <View style={styles.rowActionSlot}>
                   {isRowLoading ? (
@@ -455,7 +463,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     padding: theme.layout.cardPadding,
-    marginTop: theme.spacing.sm,
+    marginTop: theme.spacing.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
     ...theme.shadow.soft,
@@ -491,13 +499,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingRight: theme.spacing.sm,
+    minWidth: 0,
   },
   resultTitle: {
     ...theme.typography.searchResult.title,
   },
   resultRegion: {
     ...theme.typography.searchResult.region,
-    marginTop: 2,
+    marginTop: theme.spacing.xs,
   },
   chevron: {
     fontSize: theme.layout.searchResultChevronSize,
@@ -512,9 +521,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   resultDivider: {
-    height: 1,
-    backgroundColor: theme.colors.divider,
-    opacity: 0.7,
+    ...theme.divider.line,
     marginHorizontal: theme.layout.searchResultPaddingHorizontal,
   },
   detail: {
@@ -527,30 +534,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: theme.typography.inputPlaceholder.lineHeight,
+    minHeight: theme.layout.favoriteTouchSize,
   },
   favoriteHeaderTitle: {
-    ...theme.typography.inputPlaceholder,
+    ...theme.typography.section.inCardTitle,
     flex: 1,
   },
   favoriteToggleButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: theme.typography.inputPlaceholder.lineHeight,
+    minHeight: theme.layout.favoriteTouchSize,
     paddingHorizontal: theme.spacing.sm,
   },
   favoriteToggleIcon: {
-    ...theme.typography.inputPlaceholder,
-    lineHeight: theme.typography.inputPlaceholder.lineHeight,
+    ...theme.typography.section.inCardCaption,
   },
   listText: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text,
+    ...theme.typography.weekly.day,
+    flexShrink: 1,
   },
   favoriteRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.md,
+    minHeight: theme.layout.listRowHeight,
     marginTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.divider,
@@ -558,7 +564,8 @@ const styles = StyleSheet.create({
   favoriteMain: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: theme.layout.heroActionMinSize,
+    minWidth: 0,
+    minHeight: theme.layout.listRowHeight,
   },
   favoriteStarButton: {
     alignItems: 'center',

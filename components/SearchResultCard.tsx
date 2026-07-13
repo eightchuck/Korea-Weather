@@ -32,7 +32,9 @@ export default function SearchResultCard({
           <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
         </Pressable>
       </View>
-      <Text style={styles.location}>{location.name}</Text>
+      <Text style={styles.location} numberOfLines={2}>
+        {location.name}
+      </Text>
       <View style={styles.weatherRow}>
         <WeatherIcon icon={weather.icon} size={48} />
         <Text style={styles.weather}>

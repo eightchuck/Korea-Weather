@@ -65,10 +65,10 @@ const styles = StyleSheet.create({
     width: 1,
     height: 36,
     backgroundColor: theme.colors.divider,
+    opacity: 0.7,
   },
   statLabel: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.subText,
+    ...theme.typography.label,
     marginBottom: theme.spacing.xs,
   },
   statValue: {

@@ -268,10 +268,8 @@ const styles = StyleSheet.create({
     opacity: theme.interaction.pressedOpacity,
   },
   actionButtonText: {
+    ...theme.typography.button.label,
     color: theme.colors.text,
-    fontSize: theme.fontSize.caption,
-    fontWeight: '600',
-    letterSpacing: 0.1,
   },
   updatedAt: {
     fontSize: theme.fontSize.caption,

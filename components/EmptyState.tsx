@@ -25,8 +25,14 @@ export default function EmptyState({
       ]}
     >
       {icon ? <Text style={styles.icon}>{icon}</Text> : null}
-      <Text style={styles.title}>{title}</Text>
-      {description ? <Text style={styles.description}>{description}</Text> : null}
+      <Text style={styles.title} numberOfLines={2}>
+        {title}
+      </Text>
+      {description ? (
+        <Text style={styles.description} numberOfLines={3}>
+          {description}
+        </Text>
+      ) : null}
     </View>
   );
 }
