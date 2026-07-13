@@ -72,6 +72,7 @@ export default function App() {
   const [lastUpdatedText, setLastUpdatedText] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [loadingFavoriteKey, setLoadingFavoriteKey] = useState<string | null>(null);
+  const [isCityWeatherReady, setIsCityWeatherReady] = useState(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getFavoriteKey = (location: FavoriteLocation) =>
@@ -198,6 +199,8 @@ export default function App() {
         setCityWeatherList(cities);
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsCityWeatherReady(true);
       }
     })();
   }, []);
@@ -353,6 +356,7 @@ export default function App() {
     : false;
 
   const showInitialLoading = isLoading && !weather;
+  const showSectionEmpty = weather != null && !errorMessage;
   const todayForecast = weeklyWeather[0];
 
   return (
@@ -415,11 +419,20 @@ export default function App() {
             />
           )}
 
-          <ForecastCard hourlyWeather={hourlyWeather} />
+          <ForecastCard
+            hourlyWeather={hourlyWeather}
+            showEmpty={showSectionEmpty && hourlyWeather.length === 0}
+          />
 
-          <WeeklyForecastCard weeklyWeather={weeklyWeather} />
+          <WeeklyForecastCard
+            weeklyWeather={weeklyWeather}
+            showEmpty={showSectionEmpty && weeklyWeather.length === 0}
+          />
 
-          <CityWeatherList cityWeatherList={cityWeatherList} />
+          <CityWeatherList
+            cityWeatherList={cityWeatherList}
+            showEmpty={isCityWeatherReady && showSectionEmpty && cityWeatherList.length === 0}
+          />
         </>
       )}
 

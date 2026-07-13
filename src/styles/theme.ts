@@ -16,6 +16,8 @@ export const colors = {
   hero: '#EAF3FC',
   heroActionSurface: 'rgba(255, 255, 255, 0.48)',
   heroActionBorder: 'rgba(255, 255, 255, 0.62)',
+  emptyStateSurface: 'rgba(74, 144, 226, 0.04)',
+  emptyStateBorder: 'rgba(0, 0, 0, 0.04)',
   primaryTint: 'rgba(74, 144, 226, 0.07)',
   primaryBorder: 'rgba(74, 144, 226, 0.22)',
   skeleton: '#E5EBF3',
@@ -124,6 +126,8 @@ export const layout = {
   searchResultChevronSize: 19,
   searchResultsMaxHeight: 340,
   rowActionSize: 22,
+  emptyStateIconSize: 22,
+  emptyStatePaddingVertical: 20,
 };
 
 export const typography = {
@@ -236,6 +240,26 @@ export const typography = {
       fontWeight: '400' as const,
       color: colors.textSecondary,
       textAlign: 'center' as const,
+    },
+  },
+  emptyState: {
+    icon: {
+      fontSize: layout.emptyStateIconSize,
+      color: colors.textSecondary,
+      textAlign: 'center' as const,
+    },
+    title: {
+      fontSize: fontSize.body,
+      fontWeight: '500' as const,
+      color: colors.text,
+      textAlign: 'center' as const,
+    },
+    description: {
+      fontSize: fontSize.caption,
+      fontWeight: '400' as const,
+      color: colors.textSecondary,
+      textAlign: 'center' as const,
+      lineHeight: 18,
     },
   },
   loading: {

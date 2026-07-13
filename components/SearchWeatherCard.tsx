@@ -17,6 +17,7 @@ import { getLocationSuggestions, KoreanLocation } from '../data/koreanLocations'
 import { FavoriteLocation } from '../services/favoriteLocations';
 import { RecentSearchItem } from '../services/recentSearch';
 import { theme } from '../src/styles/theme';
+import EmptyState from './EmptyState';
 import RecentSearchList from './RecentSearchList';
 
 if (
@@ -260,10 +261,12 @@ export default function SearchWeatherCard({
               })}
 
             {showEmptyResults && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyTitle}>검색 결과가 없습니다.</Text>
-                <Text style={styles.emptyHint}>다른 지역명을 입력해 보세요.</Text>
-              </View>
+              <EmptyState
+                icon="⌕"
+                title="검색 결과가 없습니다"
+                description="다른 지역명으로 다시 검색해 보세요"
+                compact
+              />
             )}
           </ScrollView>
         </Animated.View>
@@ -297,6 +300,14 @@ export default function SearchWeatherCard({
             </Pressable>
           )}
         </View>
+        {favoriteCount === 0 ? (
+          <EmptyState
+            icon="☆"
+            title="즐겨찾기한 지역이 없습니다"
+            description="날씨 카드의 ★ 버튼으로 자주 확인하는 지역을 추가해 보세요"
+            compact
+          />
+        ) : null}
         {showFavoriteList &&
           favoriteLocations.map((item) => {
             const itemKey = getFavoriteKey(item);
@@ -462,20 +473,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.divider,
     opacity: 0.7,
     marginHorizontal: theme.layout.searchResultPaddingHorizontal,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: theme.layout.searchResultRowHeight * 2,
-    paddingHorizontal: theme.layout.searchResultPaddingHorizontal,
-    paddingVertical: theme.spacing.xl,
-  },
-  emptyTitle: {
-    ...theme.typography.searchResult.emptyTitle,
-    marginBottom: theme.spacing.sm,
-  },
-  emptyHint: {
-    ...theme.typography.searchResult.emptyHint,
   },
   detail: {
     fontSize: theme.fontSize.caption,

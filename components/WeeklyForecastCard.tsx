@@ -1,36 +1,49 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { WeeklyWeatherItem } from '../services/weather';
 import { theme } from '../src/styles/theme';
+import EmptyState from './EmptyState';
 import SectionHeader from './SectionHeader';
 import WeatherIcon from './WeatherIcon';
 
 type Props = {
   weeklyWeather: WeeklyWeatherItem[];
+  showEmpty?: boolean;
 };
 
-export default function WeeklyForecastCard({ weeklyWeather }: Props) {
-  if (weeklyWeather.length === 0) return null;
+export default function WeeklyForecastCard({ weeklyWeather, showEmpty = false }: Props) {
+  if (weeklyWeather.length === 0 && !showEmpty) return null;
 
   return (
     <View style={styles.section}>
       <SectionHeader title="7일 예보" />
-      <View style={styles.card}>
-        {weeklyWeather.map((item, index) => (
-          <View key={index}>
-            <View style={styles.row}>
-              <Text style={styles.day}>{item.day}</Text>
-              <View style={styles.iconArea}>
-                <WeatherIcon icon={item.icon} size={theme.layout.weeklyIconSize} />
+      {weeklyWeather.length > 0 ? (
+        <View style={styles.card}>
+          {weeklyWeather.map((item, index) => (
+            <View key={index}>
+              <View style={styles.row}>
+                <Text style={styles.day}>{item.day}</Text>
+                <View style={styles.iconArea}>
+                  <WeatherIcon icon={item.icon} size={theme.layout.weeklyIconSize} />
+                </View>
+                <View style={styles.tempGroup}>
+                  <Text style={styles.minTemp}>{item.minTemp}°</Text>
+                  <Text style={styles.maxTemp}>{item.maxTemp}°</Text>
+                </View>
               </View>
-              <View style={styles.tempGroup}>
-                <Text style={styles.minTemp}>{item.minTemp}°</Text>
-                <Text style={styles.maxTemp}>{item.maxTemp}°</Text>
-              </View>
+              {index < weeklyWeather.length - 1 && <View style={styles.divider} />}
             </View>
-            {index < weeklyWeather.length - 1 && <View style={styles.divider} />}
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      ) : (
+        <View style={styles.card}>
+          <EmptyState
+            title="표시할 주간 예보가 없습니다"
+            description="잠시 후 다시 확인해 주세요"
+            compact
+            surface
+          />
+        </View>
+      )}
     </View>
   );
 }
