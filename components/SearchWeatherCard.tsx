@@ -184,7 +184,13 @@ export default function SearchWeatherCard({
     <View style={styles.wrapper}>
       <View style={styles.searchWrapper}>
         <View style={styles.searchBar}>
-          <Pressable style={styles.searchIconButton} onPress={handleSubmitSearch}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.searchIconButton,
+              pressed && styles.pressed,
+            ]}
+            onPress={handleSubmitSearch}
+          >
             <Text style={styles.searchIcon}>⌕</Text>
           </Pressable>
           <TextInput
@@ -199,7 +205,11 @@ export default function SearchWeatherCard({
             blurOnSubmit
           />
           <Pressable
-            style={[styles.clearButton, searchCity.length === 0 && styles.clearButtonHidden]}
+            style={({ pressed }) => [
+              styles.clearButton,
+              searchCity.length === 0 && styles.clearButtonHidden,
+              pressed && searchCity.length > 0 && styles.pressed,
+            ]}
             onPress={handleClearSearch}
             disabled={searchCity.length === 0}
             hitSlop={8}
@@ -291,7 +301,10 @@ export default function SearchWeatherCard({
           </Text>
           {favoriteCount > 0 && (
             <Pressable
-              style={styles.favoriteToggleButton}
+              style={({ pressed }) => [
+                styles.favoriteToggleButton,
+                pressed && styles.pressed,
+              ]}
               onPress={handleToggleFavoritesExpanded}
               hitSlop={8}
             >
@@ -320,7 +333,10 @@ export default function SearchWeatherCard({
                 style={[styles.favoriteRow, isRowLoading && styles.resultRowLoading]}
               >
                 <Pressable
-                  style={styles.favoriteMain}
+                  style={({ pressed }) => [
+                    styles.favoriteMain,
+                    pressed && !isRowLoading && styles.rowPressed,
+                  ]}
                   onPress={() => onFavoritePress(item)}
                   disabled={isRowLoading}
                 >
@@ -331,7 +347,14 @@ export default function SearchWeatherCard({
                     <ActivityIndicator size="small" color={theme.colors.primary} />
                   ) : null}
                 </View>
-                <Pressable onPress={() => onToggleFavorite(item)}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.favoriteStarButton,
+                    pressed && styles.pressed,
+                  ]}
+                  onPress={() => onToggleFavorite(item)}
+                  hitSlop={4}
+                >
                   <Text style={styles.starActive}>★</Text>
                 </Pressable>
               </View>
@@ -455,6 +478,12 @@ const styles = StyleSheet.create({
   resultRowPressed: {
     backgroundColor: theme.colors.primaryTint,
   },
+  rowPressed: {
+    backgroundColor: theme.colors.primaryTint,
+  },
+  pressed: {
+    opacity: theme.interaction.pressedOpacity,
+  },
   resultRowLoading: {
     opacity: ROW_LOADING_OPACITY,
   },
@@ -528,6 +557,14 @@ const styles = StyleSheet.create({
   },
   favoriteMain: {
     flex: 1,
+    justifyContent: 'center',
+    minHeight: theme.layout.heroActionMinSize,
+  },
+  favoriteStarButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: theme.layout.favoriteTouchSize,
+    minHeight: theme.layout.favoriteTouchSize,
   },
   starActive: {
     fontSize: 20,

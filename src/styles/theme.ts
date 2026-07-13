@@ -133,6 +133,10 @@ export const layout = {
   errorActionMinHeight: 44,
 };
 
+export const interaction = {
+  pressedOpacity: 0.85,
+} as const;
+
 export const typography = {
   inputPlaceholder: {
     fontSize: fontSize.body,
@@ -352,6 +356,7 @@ export const theme = {
   colors,
   weatherHeroBackgroundColors,
   getWeatherHeroBackgroundColor,
+  interaction,
   radius,
   spacing,
   fontSize,

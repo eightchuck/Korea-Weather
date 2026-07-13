@@ -69,7 +69,10 @@ export default function CurrentWeatherCard({
             </Text>
             {canFavorite && onToggleFavorite && (
               <Pressable
-                style={styles.favoriteButton}
+                style={({ pressed }) => [
+                  styles.favoriteButton,
+                  pressed && styles.pressed,
+                ]}
                 onPress={() => onToggleFavorite(selectedLocation)}
                 hitSlop={4}
               >
@@ -106,7 +109,11 @@ export default function CurrentWeatherCard({
 
         <View style={styles.buttonRow}>
           <Pressable
-            style={[styles.actionButton, isLocationLoading && styles.actionButtonDisabled]}
+            style={({ pressed }) => [
+              styles.actionButton,
+              isLocationLoading && styles.actionButtonDisabled,
+              pressed && !isLocationLoading && styles.pressed,
+            ]}
             onPress={onReturnToCurrentLocation}
             disabled={isLocationLoading}
           >
@@ -117,9 +124,10 @@ export default function CurrentWeatherCard({
             )}
           </Pressable>
           <Pressable
-            style={[
+            style={({ pressed }) => [
               styles.actionButton,
               (isLocationLoading || !canRefresh) && styles.actionButtonDisabled,
+              pressed && !isLocationLoading && canRefresh && styles.pressed,
             ]}
             onPress={onRefresh}
             disabled={isLocationLoading || !canRefresh}
@@ -255,6 +263,9 @@ const styles = StyleSheet.create({
   },
   actionButtonDisabled: {
     opacity: 0.55,
+  },
+  pressed: {
+    opacity: theme.interaction.pressedOpacity,
   },
   actionButtonText: {
     color: theme.colors.text,

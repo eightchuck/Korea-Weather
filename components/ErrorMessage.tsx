@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
   },
   retryButtonPressed: {
-    opacity: 0.85,
+    opacity: theme.interaction.pressedOpacity,
   },
   retryButtonText: {
     ...theme.typography.errorState.buttonText,

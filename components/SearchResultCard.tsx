@@ -21,7 +21,14 @@ export default function SearchResultCard({
     <View style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.label}>검색 결과</Text>
-        <Pressable onPress={() => onToggleFavorite(location)}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.starButtonWrap,
+            pressed && styles.pressed,
+          ]}
+          onPress={() => onToggleFavorite(location)}
+          hitSlop={4}
+        >
           <Text style={styles.starButton}>{isFavorite ? '★' : '☆'}</Text>
         </Pressable>
       </View>
@@ -59,6 +66,15 @@ const styles = StyleSheet.create({
   starButton: {
     fontSize: 24,
     color: theme.colors.warning,
+  },
+  starButtonWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: theme.layout.favoriteTouchSize,
+    minHeight: theme.layout.favoriteTouchSize,
+  },
+  pressed: {
+    opacity: theme.interaction.pressedOpacity,
   },
   location: {
     fontSize: theme.fontSize.subtitle,

@@ -21,16 +21,33 @@ export default function RecentSearchList({
     <View style={styles.recentList}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>최근 검색</Text>
-        <Pressable onPress={onClearRecentSearches}>
+        <Pressable
+          style={({ pressed }) => [styles.clearAllButtonWrap, pressed && styles.pressed]}
+          onPress={onClearRecentSearches}
+          hitSlop={4}
+        >
           <Text style={styles.clearAllButton}>전체삭제</Text>
         </Pressable>
       </View>
       {recentSearches.map((item) => (
         <View key={`${item.name}-${item.lat}-${item.lon}`} style={styles.recentRow}>
-          <Pressable style={styles.recentMain} onPress={() => onRecentSearchPress(item)}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.recentMain,
+              pressed && styles.rowPressed,
+            ]}
+            onPress={() => onRecentSearchPress(item)}
+          >
             <Text style={styles.listText}>{item.name}</Text>
           </Pressable>
-          <Pressable onPress={() => onRemoveRecentSearch(item)}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.removeButtonWrap,
+              pressed && styles.pressed,
+            ]}
+            onPress={() => onRemoveRecentSearch(item)}
+            hitSlop={4}
+          >
             <Text style={styles.removeButton}>✕</Text>
           </Pressable>
         </View>
@@ -58,6 +75,9 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.caption,
     color: theme.colors.danger,
   },
+  clearAllButtonWrap: {
+    paddingVertical: theme.spacing.xs,
+  },
   recentRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -68,6 +88,14 @@ const styles = StyleSheet.create({
   },
   recentMain: {
     flex: 1,
+    justifyContent: 'center',
+    minHeight: theme.layout.heroActionMinSize,
+  },
+  rowPressed: {
+    backgroundColor: theme.colors.primaryTint,
+  },
+  pressed: {
+    opacity: theme.interaction.pressedOpacity,
   },
   listText: {
     fontSize: theme.fontSize.body,
@@ -77,5 +105,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: theme.colors.subText,
     paddingHorizontal: theme.spacing.sm,
+  },
+  removeButtonWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: theme.layout.favoriteTouchSize,
+    minHeight: theme.layout.favoriteTouchSize,
   },
 });
