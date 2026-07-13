@@ -14,18 +14,20 @@ export const colors = {
   warning: '#F59E0B',
   success: '#10B981',
   hero: '#EAF3FC',
+  heroActionSurface: 'rgba(255, 255, 255, 0.48)',
+  heroActionBorder: 'rgba(255, 255, 255, 0.62)',
   primaryTint: 'rgba(74, 144, 226, 0.07)',
   primaryBorder: 'rgba(74, 144, 226, 0.22)',
   skeleton: '#E5EBF3',
 };
 
 export const weatherHeroBackgroundColors = {
-  clear: '#D6E8F7',
-  clouds: '#E8EDF2',
-  rain: '#DCE5EE',
-  snow: '#ECF3FA',
-  mist: '#F1F3F6',
-  default: '#E6EBF2',
+  clear: '#D2E4F4',
+  clouds: '#E4E9EF',
+  rain: '#D6E0EA',
+  snow: '#E6EEF6',
+  mist: '#ECEFF3',
+  default: '#E2E8F0',
 } as const;
 
 export function getWeatherHeroBackgroundColor(
@@ -85,11 +87,12 @@ export const fontSize = {
   searchResultRegion: 14,
   body: 16,
   sectionHeader: 18,
-  heroCondition: 24,
+  heroCondition: 20,
+  heroTemperatureUnit: 34,
   subtitle: 20,
   title: 28,
   temperature: 56,
-  heroTemperature: 78,
+  heroTemperature: 72,
 };
 
 export const layout = {
@@ -99,8 +102,10 @@ export const layout = {
   searchHeight: 54,
   favoriteTouchSize: 44,
   favoriteIconSize: 15,
-  heroPaddingTop: 28,
-  heroPaddingBottom: 24,
+  heroPaddingTop: 24,
+  heroPaddingBottom: 20,
+  heroIconSize: 28,
+  heroActionMinSize: 44,
   hourlyCardWidth: 72,
   hourlyCardHeight: 110,
   hourlyCardGap: 11,
@@ -133,26 +138,39 @@ export const typography = {
       fontSize: fontSize.caption,
       fontWeight: '500' as const,
       color: colors.textSecondary,
+      letterSpacing: 0.2,
     },
     locationName: {
       fontSize: fontSize.sectionHeader,
       fontWeight: '600' as const,
       color: colors.text,
+      letterSpacing: -0.3,
+      lineHeight: 26,
     },
     temperature: {
       fontSize: fontSize.heroTemperature,
-      fontWeight: '700' as const,
+      fontWeight: '600' as const,
       color: colors.text,
+      letterSpacing: -2,
+      lineHeight: 76,
+    },
+    temperatureUnit: {
+      fontSize: fontSize.heroTemperatureUnit,
+      fontWeight: '500' as const,
+      color: colors.text,
+      lineHeight: 40,
     },
     condition: {
       fontSize: fontSize.heroCondition,
       fontWeight: '500' as const,
-      color: colors.text,
+      color: colors.textSecondary,
     },
     summary: {
-      fontSize: fontSize.body,
+      fontSize: fontSize.caption,
       fontWeight: '400' as const,
       color: colors.textSecondary,
+      letterSpacing: 0.15,
+      lineHeight: 18,
     },
   },
   hourly: {
@@ -268,6 +286,13 @@ export const shadow = {
     shadowOpacity: 0.04,
     shadowRadius: 3,
     elevation: 1,
+  } satisfies ViewStyle,
+  hero: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   } satisfies ViewStyle,
 };
 

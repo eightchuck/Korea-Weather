@@ -87,9 +87,12 @@ export default function CurrentWeatherCard({
 
           {weather ? (
             <>
-              <Text style={styles.temperature}>{weather.temperature}°</Text>
+              <View style={styles.temperatureRow}>
+                <Text style={styles.temperatureValue}>{weather.temperature}</Text>
+                <Text style={styles.temperatureUnit}>°</Text>
+              </View>
               <View style={styles.conditionRow}>
-                <WeatherIcon icon={weather.icon} size={30} />
+                <WeatherIcon icon={weather.icon} size={theme.layout.heroIconSize} />
                 <Text style={styles.condition}>{weather.condition}</Text>
               </View>
               {summaryParts.length > 0 && (
@@ -101,8 +104,6 @@ export default function CurrentWeatherCard({
           )}
         </View>
 
-        <View style={styles.heroExtension} />
-
         <View style={styles.buttonRow}>
           <Pressable
             style={[styles.actionButton, isLocationLoading && styles.actionButtonDisabled]}
@@ -110,7 +111,7 @@ export default function CurrentWeatherCard({
             disabled={isLocationLoading}
           >
             {showHeroRefreshing ? (
-              <ActivityIndicator size="small" color={theme.colors.card} />
+              <ActivityIndicator size="small" color={theme.colors.primary} />
             ) : (
               <Text style={styles.actionButtonText}>현재 위치</Text>
             )}
@@ -118,14 +119,13 @@ export default function CurrentWeatherCard({
           <Pressable
             style={[
               styles.actionButton,
-              styles.refreshButton,
               (isLocationLoading || !canRefresh) && styles.actionButtonDisabled,
             ]}
             onPress={onRefresh}
             disabled={isLocationLoading || !canRefresh}
           >
             {showHeroRefreshing ? (
-              <ActivityIndicator size="small" color={theme.colors.card} />
+              <ActivityIndicator size="small" color={theme.colors.primary} />
             ) : (
               <Text style={styles.actionButtonText}>새로고침</Text>
             )}
@@ -153,9 +153,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.layout.cardGap,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.heroActionBorder,
     overflow: 'hidden',
     position: 'relative',
+    ...theme.shadow.hero,
   },
   heroContent: {
     width: '100%',
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     paddingHorizontal: theme.layout.favoriteTouchSize / 2,
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
   },
   locationName: {
     ...theme.typography.hero.locationName,
@@ -188,10 +189,14 @@ const styles = StyleSheet.create({
     height: theme.layout.favoriteTouchSize,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: theme.colors.heroActionSurface,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.heroActionBorder,
   },
   favoriteIcon: {
-    fontSize: theme.layout.favoriteIconSize,
-    lineHeight: theme.layout.favoriteIconSize + 2,
+    fontSize: theme.layout.favoriteIconSize + 1,
+    lineHeight: theme.layout.favoriteIconSize + 3,
   },
   favoriteIconInactive: {
     color: theme.colors.textSecondary,
@@ -199,18 +204,27 @@ const styles = StyleSheet.create({
   favoriteIconActive: {
     color: theme.colors.primary,
   },
-  temperature: {
+  temperatureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  temperatureValue: {
     ...theme.typography.hero.temperature,
     textAlign: 'center',
-    letterSpacing: -1,
-    marginBottom: theme.spacing.sm,
+  },
+  temperatureUnit: {
+    ...theme.typography.hero.temperatureUnit,
+    marginTop: 10,
+    marginLeft: 1,
   },
   conditionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.xs,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   condition: {
     ...theme.typography.hero.condition,
@@ -219,36 +233,34 @@ const styles = StyleSheet.create({
   summary: {
     ...theme.typography.hero.summary,
     textAlign: 'center',
-  },
-  heroExtension: {
-    width: '100%',
-    minHeight: 0,
+    marginBottom: theme.spacing.xs,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    zIndex: 1,
   },
   actionButton: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.heroActionSurface,
     borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.heroActionBorder,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    minWidth: 88,
-    minHeight: 32,
+    minWidth: 96,
+    minHeight: theme.layout.heroActionMinSize,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  refreshButton: {
-    backgroundColor: theme.colors.success,
-  },
   actionButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
   actionButtonText: {
-    color: theme.colors.card,
+    color: theme.colors.text,
     fontSize: theme.fontSize.caption,
     fontWeight: '600',
+    letterSpacing: 0.1,
   },
   updatedAt: {
     fontSize: theme.fontSize.caption,
@@ -257,9 +269,10 @@ const styles = StyleSheet.create({
   },
   footerStatusSlot: {
     minHeight: 18,
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 1,
   },
   updatingStatus: {
     ...theme.typography.loading.heroUpdating,
